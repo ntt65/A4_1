@@ -1,31 +1,33 @@
 # [A4_1] TF-IDF 기반 지능형 문서 검색기 & 분류 시스템 구현 계획 (개정안)
 
-Scikit-learn 내장 알고리즘에 의존하지 않고, 순수 **NumPy 기반 벡터 연산**으로 TF-IDF 수식, 코사인 유사도 검색, 머신러닝 분류 및 고급 검색 알고리즘(BM25, 역색인)을 구현하며, 엄밀한 수치적 일치 검증($10^{-6}$ 미만)과 데이터 누수 방지 원칙을 철저히 준수하는 엔지니어링 구현 계획서입니다.
+**NumPy 기반 벡터 연산**으로 TF-IDF, 코사인 유사도 검색, TF 변형 및 BM25를 직접 구현하고, 역색인으로 검색을 가속합니다. 데이터 로딩, 분류 모델(Logistic Regression), 평가 및 참조 검증에는 Scikit-learn을 사용합니다. TF-IDF 최대 절대 오차 $10^{-6}$ 미만 검증과 학습·시험 데이터 분리를 구현 기준으로 삼습니다.
 
 ---
 
 ### User Review & Critical Decisions
 
 > [!IMPORTANT]
-> 전문가 코드 리뷰 및 요구사항 검토를 거쳐 다음 7가지 핵심 엔지니어링 기준이 보완·확정되었습니다.
+> 구현계획 검토를 반영하여 다음 8가지 기준을 정했습니다. 아래 체크리스트는 앞으로 수행할 작업이며, 검증·라이선스·개인정보 확인이 이미 완료되었다는 뜻은 아닙니다.
 
 1. **데이터 누수(Data Leakage) 엄격 차단**:
    - 어휘 사전(Vocabulary)과 IDF 통계량은 **오직 Train 데이터(80%)로만 `fit`** 합니다. Test 데이터(20%)는 오직 `transform`만 수행합니다.
    - 8:2 단일 분할(`random_state=42`)을 초기에 1회 고정 수행하고, 모든 비교 실험(TF 변형, 분류 모델, 검증)에서 동일 분할을 재사용합니다.
-2. **Scikit-learn 1:1 오차 $10^{-6}$ 미만 보장 프로토콜**:
+2. **Scikit-learn 1:1 오차 $10^{-6}$ 미만 검증 프로토콜**:
    - `smooth_idf=True`, `norm='l2'`, `sublinear_tf=False` 일치화.
    - 토큰화 정규식(`r'(?u)\b\w\w+\b'`, 1글자 단어 제외) 및 소문자화, 단어 사전 알파벳 오름차순 정렬을 Sklearn과 완전 일치화.
+   - 소문자화·토큰화·불용어 제거를 수행하는 공통 `preprocess_pipeline`을 양쪽 구현에서 사용합니다. 불용어 목록은 `resources/stopwords_en.txt`에 고정하고 출처·버전을 기록합니다.
    - `float64` 정밀도를 강제하여 TF(Count), DF, IDF, L2 정규화 행렬을 단계별로 assertion 검증.
 3. **데이터 윤리 및 저작권 준수 (과제 원문 5쪽)**:
-   - 20 Newsgroups 데이터셋의 개인정보 미포함(PII Check) 및 학술/공개 라이선스 상태를 체크리스트와 수락 기준에 공식 반영.
+   - 데이터셋 원본 배포처의 이용·재배포 조건, 근거 URL, 확인일을 기록합니다. Scikit-learn 코드의 라이선스를 데이터셋에 그대로 적용하거나, 근거 없이 BSD로 단정하지 않습니다.
+   - 헤더·푸터·인용문 제거와 별도로 이메일·전화번호 등 자동 검사 및 이름·본문·서명 수동 검수를 수행합니다. 식별 가능한 개인정보가 있는 문서는 비식별화하거나 제외하고 재검사합니다. 확인되지 않은 사항은 미확인으로 기록하며, 과제의 데이터 사용 조건을 충족한 자료만 사용합니다.
 4. **수치 안정성 및 Zero-Division 방어**:
    - **Double Normalization**: $\text{tf} > 0$인 원소에만 $0.5 + 0.5 \times \frac{\text{tf}}{\max(\text{tf})}$를 적용하고, $\text{tf} = 0$은 0으로 보존.
    - **영벡터 방어**: OOV(사전 미등재) 단어만 있는 쿼리나 빈 문서의 L2 Norm이 0일 경우, 나누기 에러를 회피하고 영벡터를 반환.
 5. **검색 시간 복잡도 표기 정정 및 벤치마크 기준**:
-   - Dense 행렬 연산 $D \cdot q$의 이론적 복잡도는 **$O(N \cdot |V|)$** 이며, Top-K 정렬은 `np.argpartition`을 활용해 $O(N + K \log K)$로 최적화.
-   - 역색인 벤치마크는 **인덱스 구축 시간**과 **질의 실행 시간**을 명확히 분리하고, 전체 스캔과 동일 점수·순위가 나오는지 동치성(Equivalence)을 사전 검증.
+   - Dense 행렬 연산 $D \cdot q$는 **$O(N \cdot |V|)$** 입니다. 양수 점수 문서만 반환하며, Top-K 경계 동점까지 점수 내림차순·문서 ID 오름차순을 적용합니다. 부분 선택과 선택된 결과 정렬 비용은 $O(N + K \log K)$입니다.
+   - 역색인 벤치마크는 **인덱스 구축 시간**과 **질의 실행 시간**을 분리합니다. 전체 스캔과 역색인에 동일한 0점 제외·동점 정책을 적용하고, 점수 허용오차와 문서 ID 순서를 각각 검증합니다.
 6. **데이터 로더 및 재현성 강화**:
-   - `fetch_20newsgroups`의 메타데이터 누수(헤더, 푸터, 인용문)를 차단하기 위해 `remove=('headers', 'footers', 'quotes')` 옵션 적용. 로컬 캐시 경로 명시 및 문서 수/클래스 분포 로깅.
+   - `fetch_20newsgroups`에 `remove=('headers', 'footers', 'quotes')`를 적용하여 메타데이터에 의한 분류 편향을 줄입니다. 이 옵션을 개인정보 제거의 완료 기준으로 사용하지 않습니다. 로컬 캐시 경로와 데이터 선택 설정을 명시하고 문서 수·클래스 분포를 기록합니다.
 7. **BM25 수식 및 검증 기준 구체화**:
    - 음수 IDF 방지형 Robertson-Spärck Jones IDF 및 $k_1=1.5, b=0.75$, 문서 길이 페널티 수식 채택. Toy 예제(문서 3건) 수작업 계산 검증 추가.
 8. **파이프라인 작업 순서 재정렬**:
@@ -35,8 +37,8 @@ Scikit-learn 내장 알고리즘에 의존하지 않고, 순수 **NumPy 기반 �
 
 ### 1. Overview & Core Concept
 
-- **목적**: 정보 검색(IR) 및 자연어 처리(NLP) 파이프라인 전 과정을 서드파티 라이브러리의 블랙박스 없이 순수 NumPy 기반 수식으로 구현합니다.
-- **핵심 목표**: Scikit-learn의 `TfidfVectorizer` 결과와의 최대 오차를 $10^{-6}$ 이내로 제어하고, Bag-of-Words(BoW)의 구조적 한계(어순 무시, 문맥 소실, 동음이의어/다의어)를 정량적 지표와 5건 이상의 실제 오분류 사례 분석을 통해 규명합니다.
+- **목적**: TF-IDF·코사인 유사도·TF 변형·BM25의 수식을 NumPy로 직접 구현하고 역색인 구조를 구축합니다. Scikit-learn의 데이터 로더, `LogisticRegression`, 평가 지표 및 검증용 벡터라이저를 사용하여 전체 파이프라인을 구성합니다.
+- **핵심 목표**: Scikit-learn의 `TfidfVectorizer` 결과와 최대 절대 오차 $10^{-6}$ 미만인지 검증하고, Bag-of-Words(BoW)의 구조적 한계(어순 무시, 문맥 소실, 동음이의어/다의어)를 정량적 지표와 5건 이상의 실제 오분류 사례를 근거로 분석합니다.
 - **엔지니어링 철학**: 철저한 데이터 누수(Data Leakage) 방지, 수치적 안정성(Zero-Division Guard), 정확한 계산 복잡도 분석.
 
 ---
@@ -46,7 +48,7 @@ Scikit-learn 내장 알고리즘에 의존하지 않고, 순수 **NumPy 기반 �
 - **인덱스 빌드 및 저장 / 로드 아키텍처**:
   - `python main.py --build-index`: Train 셋을 기반으로 어휘 사전, IDF 벡터, 문서 정규화 행렬을 생성하여 `artifacts/index.pkl`로 직렬화 저장.
   - `SearchEngine.load()`: 기구축된 인덱스를 로드하여 재학습 없이 초고속 질의 응답 제공.
-- **CLI 실행 인터페이스 (과제 요구 안 A)**:
+- **CLI 실행 인터페이스 (과제의 선택 가능한 안 A, 본 프로젝트에서 구현)**:
   ```bash
   # 1. 문서 검색 실행
   python main.py --query "satellite orbit launch system" --topk 5
@@ -60,7 +62,7 @@ Scikit-learn 내장 알고리즘에 의존하지 않고, 순수 **NumPy 기반 �
   # 4. 보너스 과제 실행 (TF 변형 비교, BM25 비교, 역색인 벤치마크)
   python main.py --bonus
   ```
-- **함수형 인터페이스 (과제 요구 안 B)**:
+- **함수형 인터페이스 (과제의 선택 가능한 안 B, 본 프로젝트에서 함께 구현)**:
   ```python
   from src.search_engine import SearchEngine
 
@@ -81,9 +83,13 @@ $$\text{Train Corpus } D_{\text{train}} \xrightarrow{\text{fit}} \text{Vocab } V
 $$\text{Train Matrix } X_{\text{train}} = \text{transform}(D_{\text{train}}), \quad \text{Test Matrix } X_{\text{test}} = \text{transform}(D_{\text{test}})$$
 Test 데이터의 문서 빈도(DF)나 신규 단어는 Vocabulary 및 IDF 계산에 일절 개입하지 않으며, Test 문서 내 OOV 단어는 무시됩니다.
 
-#### B. Scikit-learn 동치 수식 ($10^{-6}$ 오차 보장)
+#### B. Scikit-learn 동치 수식 및 검증 조건 ($10^{-6}$ 미만)
 - **토큰화**: Sklearn 기본 정규식 `r'(?u)\b\w\w+\b'` 준수 (한 글자 단어 제외, 소문자화).
+- **불용어 및 공통 입력**: `resources/stopwords_en.txt`에 소문자·중복 없는 불용어 목록을 고정하고 출처·버전을 README에 기록합니다. `preprocess_pipeline(text: str) -> list[str]` 내부에서 소문자화, 위 정규식 토큰화, 고정 목록 기반 불용어 제거를 수행합니다. 동의어 치환은 적용하지 않으며, 그 선택 이유를 README에 설명합니다.
+- **검증용 참조 설정**: Custom 구현과 Scikit-learn에 같은 원문과 동일한 `preprocess_pipeline`을 적용합니다. 참조 구현은 아래 callable analyzer를 사용하므로, 불용어 제거를 포함한 전처리는 analyzer 안에서 완료합니다. Scikit-learn의 기본 불용어 설정에 처리를 맡기지 않습니다.
+  `TfidfVectorizer(analyzer=preprocess_pipeline, stop_words=None, dtype=np.float64, smooth_idf=True, norm='l2', sublinear_tf=False)`
 - **어휘 정렬**: 사전의 모든 키를 알파벳 오름차순(`sorted(vocab.keys())`)으로 0부터 정수 인덱싱.
+- **검증 입력과 순서**: Train으로 각각 학습한 두 구현에 대해 토큰열, 어휘 집합·열 순서, Shape, TF, DF, IDF를 확인한 뒤 Train·Test·쿼리의 최종 벡터를 비교합니다. 빈 문서, 불용어만 있는 문장, OOV만 있는 쿼리도 포함합니다.
 - **Smooth IDF**:
   $$\text{idf}(t) = \ln\left(\frac{1 + N_{\text{train}}}{1 + \text{df}_{\text{train}}(t)}\right) + 1$$
 - **L2 Normalization & Zero-Division 방어**:
@@ -98,7 +104,16 @@ Test 데이터의 문서 빈도(DF)나 신규 단어는 Vocabulary 및 IDF 계�
 #### D. BM25 수식 (Robertson-Spärck Jones)
 $$\text{IDF}_{\text{BM25}}(t) = \ln\left(\frac{N - \text{df}(t) + 0.5}{\text{df}(t) + 0.5} + 1\right)$$
 $$\text{Score}(D, Q) = \sum_{t \in Q} \text{IDF}_{\text{BM25}}(t) \cdot \frac{f_{t, D} \cdot (k_1 + 1)}{f_{t, D} + k_1 \cdot \left(1 - b + b \cdot \frac{|D|}{\text{avgdl}}\right)}$$
-($k_1 = 1.5$, $b = 0.75$, $|D|$는 문서 단어 수, $\text{avgdl}$은 전체 Train 문서의 평균 길이)
+($k_1 = 1.5$, $b = 0.75$; $N$과 $\text{df}$는 Train 기준이며, $f_{t,D}$는 정규화하지 않은 단어 출현 횟수입니다. $|D|$는 공통 전처리와 불용어 제거 후 토큰 수, $\text{avgdl}$은 같은 기준의 Train 문서 평균 길이입니다. $Q$는 사전에 있는 고유 쿼리 용어의 집합으로, 반복 쿼리어는 한 번만 합산합니다.)
+
+빈 문서의 점수는 0으로 정의합니다. Train 데이터가 없거나 전처리 후 전체 어휘가 비어 있으면 인덱스 구축을 오류로 종료하고 입력을 점검하도록 안내합니다.
+
+#### E. Top-K 반환 및 전체 스캔·역색인 동치성
+- **반환 정책**: 점수가 0보다 큰 문서만 반환합니다. 양수 점수 문서가 $K$건보다 적으면 실제 건수만 반환하며, 빈 쿼리·OOV 쿼리·검색 결과 없음은 함수에서 `[]`로 반환하고 CLI에서 안내합니다.
+- **입력 및 정렬**: `top_k`는 양의 정수여야 하며, 그 외에는 `ValueError`로 처리합니다. 양수 점수 문서 수를 $M$, 실제 반환 수를 $K'=\min(K,M)$로 정합니다. 결과 순서는 **점수 내림차순 → 동일 점수에서 `doc_id` 오름차순**입니다.
+- **경계 동점 처리**: $M=0$이면 즉시 `[]`를 반환합니다. 그 외에는 `np.argpartition`으로 $K'$번째 점수 $\tau$를 구하고, $\text{score}>\tau$인 문서를 먼저 선택합니다. $\text{score}=\tau$인 문서에서는 부족한 개수만큼 작은 `doc_id`를 부분 선택한 뒤, 선택된 $K'$건만 위 정렬 규칙으로 정렬합니다. $K'=M$이면 전체 양수 후보를 정렬하며, 동점 후보 전체를 별도 정렬하여 비용을 늘리지 않습니다.
+- **점수와 순위 검증**: 전체 스캔과 역색인은 같은 코퍼스·쿼리·점수식·`float64`·쿼리 용어 순서 및 합산 방식을 사용합니다. 점수는 같은 `doc_id`끼리 `np.allclose(rtol=0, atol=1e-12)`로 비교하고, 반환 문서 ID 순서는 별도로 완전히 일치해야 합니다. 점수 허용오차를 동점 판정 기준으로 사용하지 않습니다.
+- **필수 비교 예제**: 일반 쿼리, 빈/OOV 쿼리, 결과가 $K$건 미만인 경우, $K$가 전체 문서 수보다 큰 경우, $K$ 경계의 동점 및 잘못된 `top_k` 입력을 검증합니다.
 
 ---
 
@@ -109,7 +124,7 @@ $$\text{Score}(D, Q) = \sum_{t \in Q} \text{IDF}_{\text{BM25}}(t) \cdot \frac{f_
 │               Data Acquisition & Leakage Prevention (M1)              │
 │        20 Newsgroups (4 Categories, ~2,500 docs, remove headers/footers)│
 │        ─── Fixed 8:2 Split ───► Train Set (80%) | Test Set (20%)      │
-│        Check: License (BSD) & PII Sanitization Confirmed               │
+│        Gates: Dataset Usage Terms Review & PII Inspection             │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
                                     ▼
@@ -132,8 +147,8 @@ $$\text{Score}(D, Q) = \sum_{t \in Q} \text{IDF}_{\text{BM25}}(t) \cdot \frac{f_
 │     (M3)       │      │      (M4)        │     │       (M6)        │
 │• Cosine Matrix │      │• Logistic Reg    │     │• TF Variations    │
 │  D @ q: O(N|V|)│      │  (Train fit only)│     │  (Zero-safe)      │
-│• Top-K Partial │      │• Accuracy & F1   │     │• BM25 Engine      │
-│  Sort O(N+KlogK│      │• Confusion Matrix│     │• Inverted Index   │
+│• Top-K + Ties  │      │• Accuracy & F1   │     │• BM25 Engine      │
+│  O(N+K log K)  │      │• Confusion Matrix│     │• Inverted Index   │
 │• Save/Load Idx │      │• 5 Error Analyses│     │  Equiv & Benchmark│
 └────────────────┘      └──────────────────┘     └───────────────────┘
                                     │
@@ -149,22 +164,24 @@ $$\text{Score}(D, Q) = \sum_{t \in Q} \text{IDF}_{\text{BM25}}(t) \cdot \frac{f_
 
 ## 📋 GitHub 이슈(Issue)별 상세 마일스톤 및 체크리스트
 
-GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록 가능한 이슈별 명세입니다.
+GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 이미 등록한 이슈를 기준으로 번호를 유지합니다. **#5는 Documentation, #6은 Bonus**이며, 실행 순서는 이슈 번호와 별개로 **#1 → #2 → #3·#4 → #6 → #5**입니다. 아래는 기존 이슈에 반영할 개정 명세입니다.
 
 ### [Issue #1] [Data] 20 Newsgroups 수집, 전처리 및 데이터 누수 방지 분할
 - **Labels**: `enhancement`, `phase-1`, `data-pipeline`
 - **Milestone**: `M1 - Dataset & Preprocessing`
 - **체크리스트**:
   - [ ] `fetch_20newsgroups` 4개 카테고리(`sci.space`, `comp.graphics`, `rec.sport.baseball`, `talk.politics.mideast`) 다운로드 및 로컬 캐싱 설정
-  - [ ] 메타데이터 누수 및 레이블 힌트 제거를 위한 `remove=('headers', 'footers', 'quotes')` 옵션 적용
+  - [ ] 메타데이터에 의한 분류 편향을 줄이기 위한 `remove=('headers', 'footers', 'quotes')` 옵션 적용
   - [ ] 실제 로드된 문서 수(총 ~2,500건) 및 카테고리별 분포 로깅
-  - [ ] 데이터 윤리 및 보안 확인: 개인정보(PII) 미포함 확인 및 BSD 라이선스 고지
+  - [ ] 데이터셋 원본 배포처의 이용·재배포 조건, 근거 URL, 확인일을 기록하고 Scikit-learn 코드 라이선스와 구분
+  - [ ] 개인정보 검사: 이메일·전화번호 등 자동 검사와 이름·본문·서명 수동 검수를 수행하고, 대상 문서를 비식별화하거나 제외한 뒤 재검사
   - [ ] **데이터 누수 방지**: Train/Test 8:2 단일 분할(`random_state=42`) 고정 및 결측치 제거
   - [ ] Sklearn 호환 텍스트 정제 및 토큰화 정규식(`r'(?u)\b\w\w+\b'`) 구현 (1글자 단어 제외, 소문자화)
-  - [ ] 영어 표준 불용어(Stopwords) 정의 및 제거 모듈 구축
+  - [ ] `resources/stopwords_en.txt`에 출처·버전이 명확한 불용어 목록을 고정하고 공통 `preprocess_pipeline`에서 제거
 - **수락 기준 (Acceptance Criteria)**:
   - [ ] Train 80% / Test 20% 분할이 고정 저장되어 이후 모든 모듈에서 동일 데이터셋을 참조할 것
-  - [ ] PII 및 저작권 체크리스트가 로그 또는 문서에 명시될 것
+  - [ ] 원본 이용 조건의 근거와 개인정보 검사·처리 결과가 문서에 기록되고, 사용 자료가 과제의 데이터 사용 조건을 충족할 것 (미확인 상태를 완료로 표시하지 않음)
+  - [ ] Custom 및 sklearn 참조 구현에서 동일한 전처리·불용어 목록을 사용하여 같은 토큰열을 생성할 것
 
 ### [Issue #2] [Core-NLP] NumPy 기반 TF-IDF 직접 구현 및 Sklearn $10^{-6}$ 검증
 - **Labels**: `core-algorithm`, `phase-2`, `math`
@@ -177,6 +194,7 @@ GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록
   - [ ] Smooth IDF 계산: $\text{idf}(t) = \ln((1 + N)/(1 + \text{df}(t))) + 1$
   - [ ] **수치 안정성**: L2 Norm 계산 시 0으로 나누기 방어 코드 (`norm == 0`인 경우 영벡터 반환)
   - [ ] `verify_tfidf.py` 단계별 정밀 검증 스크립트 작성:
+    - [ ] 공통 `preprocess_pipeline`을 callable analyzer로 전달하고 고정 불용어 목록·토큰열 일치 확인
     - [ ] Vocabulary 일치 및 Shape 일치 확인
     - [ ] DF 및 IDF 벡터 오차 검증
     - [ ] 최종 L2 정규화 TF-IDF 행렬 최대 오차 $\max |X_{\text{custom}} - X_{\text{sklearn}}| < 1.0 \times 10^{-6}$ 검증
@@ -184,6 +202,7 @@ GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록
 - **수락 기준 (Acceptance Criteria)**:
   - [ ] Sklearn과의 최대 오차가 $1.0 \times 10^{-6}$ 미만으로 판정 통과(PASS) 로그 출력
   - [ ] Test 문장에 대해 신규 어휘가 배제된 상태로 안정적 transform 수행 확인
+  - [ ] Train·Test·쿼리 및 빈 문서·불용어/OOV 전용 입력에 대한 오차·영벡터 검증 통과
 
 ### [Issue #3] [Search] 코사인 유사도 검색 엔진, 인덱스 직렬화 및 CLI 구축
 - **Labels**: `feature`, `phase-3`, `cli`
@@ -192,14 +211,16 @@ GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록
   - [ ] 인덱스 영속화 파이프라인: Train 데이터 기반 인덱스 빌드 및 `artifacts/index.pkl` 저장/로드(`SearchEngine.load()`)
   - [ ] 쿼리 벡터 변환: Train 단어 사전 및 IDF를 이용한 L2 정규화 쿼리 벡터 생성 (Zero-vector 방어)
   - [ ] 코사인 유사도 벡터 연산: 정규화된 문서 행렬 $D$와 쿼리 벡터 $q$ 간 행렬 곱 ($O(N \cdot |V|)$ dense 연산)
-  - [ ] Top-K 검색 가속: `np.argpartition`을 이용한 $O(N + K \log K)$ 상위 5개 문서 인덱싱
+  - [ ] Top-K 검색 가속: E절 규칙에 따라 `np.argpartition`과 경계 동점 처리를 적용하여 $O(N + K \log K)$로 최대 `top_k`건 반환
+  - [ ] 양수 점수만 반환하고, 점수 내림차순·동점 시 `doc_id` 오름차순 및 `top_k` 입력 검증을 공통 결과 선택 함수에 구현
   - [ ] 검색 결과 포맷터: 유사도 스코어(소수점 4자리), 문서 ID, 150자 스니펫 출력
   - [ ] 과제 필수 인터페이스 구현:
     - [ ] **(안 A) CLI**: `python main.py --query "..." --topk 5`
     - [ ] **(안 B) 함수 시그니처**: `search(query: str, top_k: int = 5) -> List[Tuple[float, int, str]]`
 - **수락 기준 (Acceptance Criteria)**:
-  - [ ] 사전에 없는 단어만 입력되었을 때 에러 없이 유사도 0과 빈 스니펫/안내 반환
-  - [ ] CLI 및 함수 시그니처가 과제 요구사항 포맷과 100% 일치할 것
+  - [ ] 빈/OOV 쿼리는 함수에서 `[]`, CLI에서 검색 결과 없음 안내를 반환
+  - [ ] $K$ 경계 동점, 결과 부족, `top_k`가 문서 수보다 큰 경우 및 잘못된 입력의 결과가 E절 규칙과 일치
+  - [ ] CLI 및 함수 반환 형식이 명시된 인터페이스와 일치할 것
 
 ### [Issue #4] [ML/Evaluation] Logistic Regression 분류 모델 학습 및 BoW 한계 분석
 - **Labels**: `machine-learning`, `phase-4`, `evaluation`
@@ -216,7 +237,7 @@ GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록
   - [ ] Train/Test 분할 누수 없이 독립된 평가 지표 산출
   - [ ] 혼동 행렬 이미지 생성 및 5건 이상의 구체적인 오분류 원인 분석 리포트 완성
 
-### [Issue #5] [Bonus] TF 변형 비교, BM25 엔진 및 역색인(Inverted Index)
+### [Issue #6] [Bonus] TF 변형 비교, BM25 엔진 및 역색인(Inverted Index)
 - **Labels**: `bonus`, `advanced-ir`
 - **Milestone**: `M6 - Bonus Advanced Tasks`
 - **체크리스트**:
@@ -230,13 +251,13 @@ GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록
     - [ ] 동일 쿼리에 대해 TF-IDF vs BM25 상위 Top-5 검색 결과 비교 분석
   - [ ] **3. 역색인(Inverted Index) 구현 & 동치성/성능 벤치마크**:
     - [ ] 단어 $\rightarrow$ 포스팅 리스트(`doc_id`, `tf`) 구조 구현
-    - [ ] **동치성 검증**: 역색인 기반 검색 결과가 전체 스캔(Full-scan) 검색과 동일한 점수·순위를 반환하는지 검증
+    - [ ] **동치성 검증**: E절의 공통 결과 선택 함수를 사용하고, 전체 스캔과 역색인의 문서별 점수를 `np.allclose(rtol=0, atol=1e-12)`로 비교하며 반환 문서 ID 순서는 완전히 일치하는지 검증
     - [ ] **벤치마크 분리**: 인덱스 구축 시간과 단일 쿼리 실행 시간(ms)을 분리 측정하여 전체 스캔 대비 속도 비교
 - **수락 기준 (Acceptance Criteria)**:
-  - [ ] Toy example 단위 테스트 통과 및 역색인-전체스캔 간 검색 결과 100% 일치
+  - [ ] BM25 Toy example 단위 테스트 통과 및 E절의 일반·동점·0점·결과 부족 예제에서 전체 스캔/역색인 점수 허용오차와 문서 ID 순서 검증 통과
   - [ ] TF 변형 비교 및 BM25 비교 분석 결과 리포트 수록
 
-### [Issue #6] [Documentation] 필수 3단 구성 README.md 및 제출 패키징
+### [Issue #5] [Documentation] 필수 3단 구성 README.md 및 제출 패키징
 - **Labels**: `documentation`, `phase-5`
 - **Milestone**: `M5 - Final Report & Packaging`
 - **체크리스트**:
@@ -245,6 +266,7 @@ GitHub 저장소(`https://github.com/ntt65/A4_1/`)에 복사하여 즉시 등록
     - [ ] **2단: 검증/실험 결과**: TF-IDF 검증 오차 로그, 분류 성능표, 혼동 행렬 시각화, BM25/역색인 실험표
     - [ ] **3단: 한계와 개선 방향**: BoW 한계 분석, 5개 오분류 원인, 사전학습 언어모델(Transformer) 후속 학습 방향
   - [ ] 실행 방법 안내 (CLI 커맨드 예시 및 `search()` 함수 호출 예시)
+  - [ ] NumPy 직접 구현 범위와 Scikit-learn 사용 범위, 고정 불용어 출처·버전, 동의어 미적용 근거, 데이터 이용 조건·개인정보 검사 결과 및 검색 동점·0점 정책 명시
   - [ ] Python 3.10+ 구동용 의존성 명시 (`requirements.txt`)
 - **수락 기준 (Acceptance Criteria)**:
   - [ ] 과제 PDF 가이드라인의 모든 필수 문항 및 결과 양식이 누락 없이 완비될 것
