@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-11-12T08:11:10.765246+09:00",
+  "scope": "cleaned training and test documents used by the pipeline",
+  "documents_checked": 3787,
+  "pattern_matches": {
+    "email": 0,
+    "phone_candidate": 0,
+    "name_or_title_candidate": 18426
+  },
+  "documents_with_candidates": 2292,
+  "review_status": "manual_review_pending",
+  "limitations": "Capitalized word sequences include titles and organizations. Lowercase names and other identifying information may be missed.",
+  "private_findings": "artifacts/private_review/findings.jsonl",
+  "public_exports": {
+    "status": "PASS",
+    "checked_metrics": 2,
+    "search_log": "numeric output",
+    "archive": "PASS"
+  },
+  "follow_up_issue": "https://github.com/ntt65/A4_1/issues/8"
+}

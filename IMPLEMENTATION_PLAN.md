@@ -14,14 +14,14 @@
 | 4 | M4 분류·오분류 분석 | 완료 | Accuracy 92.4802%, Macro-F1 0.925329, 혼동 행렬과 실제 오분류 5건 |
 | 5 | M6 TF 변형·BM25·역색인 | 완료 | BM25 Toy 오차 2.2204e-16, 역색인 7개 질의 Top-5 100% 일치 |
 | 6 | M5 평가 문서·실행 패키지 | 작성·검사 완료 | README 3단 구성, Q&A, 발표 개요, 소스 ZIP |
-| 7 | 데이터 개인정보·이용 조건 검수 | 후속 작업 | 이슈 #8 |
+| 7 | 데이터 개인정보·이용 조건 검수 | 부분 완료 | 배포 조건·불용어 근거·자동 검사·공개 생성 경로 확인, 전체 인명 검수는 이슈 #8 |
 | 8 | 작업 브랜치 커밋·푸시·PR | 완료 | 구현 커밋 e3ff7e8, 원격 푸시, main 대상 PR #9 |
 
-실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. 회귀 검사 23개와 요청된 네 CLI 명령을 통과했습니다.
+실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. 회귀 검사 29개와 요청된 네 CLI 명령을 통과했습니다.
 
 현재 환경은 Python 3.14.7과 고정된 설치 패키지 조합입니다. 제공 소스의 구버전 의존성 범위를 현재 환경에 맞추고, 누락 import·초기화 파일명·실패 종료 코드·보너스 검증을 보완했습니다. 공통 analyzer의 실제 진입점은 `TextPreprocessor.tokenize`입니다.
 
-전체 코퍼스의 인명·서명 검수, 데이터 이용·재배포 조건, 불용어 목록의 원출처 확인은 후속 이슈에서 진행합니다. [데이터 검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
+후속 브랜치 `feat/a4-1-data-review`는 구현 수정 전에 생성하고 첫 커밋 8979244에 실행 계획을 기록했습니다. 정확한 Figshare 다운로드 항목의 CC BY 4.0 표기와 고정 불용어 채택 근거를 확인했습니다. 자동 검사와 공개 산출물 생성 경로를 보완했으며, 전체 코퍼스의 인명·서명 검수는 이슈 #8에서 추적합니다. [후속 실행 계획](docs/A4_1_data_review_plan.md), [출처 보고서](docs/A4_1_data_sources.md), [데이터 검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
 
 구현과 산출물의 검토는 PR에서 진행합니다. [구현 커밋 e3ff7e8](https://github.com/ntt65/A4_1/commit/e3ff7e8caf528324e099eb580665c9a5756cb53a), [PR #9](https://github.com/ntt65/A4_1/pull/9)
 

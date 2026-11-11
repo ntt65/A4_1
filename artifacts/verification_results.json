@@ -57,6 +57,19 @@
   "index_reload_function_api": "PASS: saved index Top-5 and OOV query checked",
   "limitations": [
     "Full corpus personal-name review pending",
-    "Dataset usage and redistribution terms unconfirmed"
-  ]
+    "External upstream attribution of the user-supplied stopword list was not supplied; project selection rationale recorded"
+  ],
+  "follow_up_verification": {
+    "checked_at": "2026-11-12T08:15:01.082973+09:00",
+    "issue": 8,
+    "regression_tests_passed": 30,
+    "rerun_commands": [
+      "python main.py --train-classifier",
+      "python main.py --bonus"
+    ],
+    "public_metrics_schema_version": 2,
+    "source_manifest": "resources/data_sources.json",
+    "data_audit": "artifacts/privacy_audit.json",
+    "remaining": "Full corpus manual name and signature review"
+  }
 }

@@ -26,12 +26,11 @@ QUERIES = [
 ]
 
 
-def _top_results(scores, documents, top_k=5):
+def _top_results(scores, top_k=5):
     return [
         {
             "doc_id": int(document_id),
             "score": float(scores[document_id]),
-            "snippet": " ".join(documents[document_id].split())[:150],
         }
         for document_id in rank_scores(scores, top_k)
     ]
@@ -60,7 +59,7 @@ def _compare_tf_variants(vec, train_docs, y_train, test_docs, y_test, raw_matrix
         rankings = {}
         for query in QUERIES:
             query_vector = compute_variant_tfidf([query], vec, variant)[0]
-            rankings[query] = _top_results(train_matrix @ query_vector, train_docs)
+            rankings[query] = _top_results(train_matrix @ query_vector)
         results[variant] = {
             "accuracy": float(accuracy_score(y_test, prediction)),
             "macro_f1": float(f1_score(y_test, prediction, average="macro")),
@@ -139,10 +138,11 @@ def run_bonus(vec, train_docs, y_train, test_docs, y_test, target_names, X_train
             search_comparisons.append({
                 "query": query,
                 "tfidf": variants["raw"]["search_results"][query],
-                "bm25": _top_results(bm25.score(vec.preprocessor.tokenize(query)), train_docs),
+                "bm25": _top_results(bm25.score(vec.preprocessor.tokenize(query))),
             })
         inverted = _compare_inverted_index(vec, train_docs, matrix)
     results = {
+        "schema_version": 2,
         "train_documents": len(train_docs),
         "test_documents": len(test_docs),
         "target_names": list(target_names),
@@ -151,6 +151,12 @@ def run_bonus(vec, train_docs, y_train, test_docs, y_test, target_names, X_train
         "bm25_toy": toy,
         "bm25_search_comparison": search_comparisons,
         "inverted_index": inverted,
+        "public_export": {
+            "included": ["metrics", "class_labels", "public_queries", "document_ids", "scores", "synthetic_toy_example"],
+            "excluded": ["document_text", "document_snippets", "vocabulary_terms"],
+            "full_corpus_review": "pending",
+            "review_issue": "https://github.com/ntt65/A4_1/issues/8",
+        },
     }
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     destination = ARTIFACTS / "bonus_metrics.json"

@@ -14,8 +14,8 @@
 | TF-IDF 검증 | Train 최대 오차 2.3315e-15, Test 8.3267e-16 |
 | 분류 | Accuracy 92.4802%, Macro-F1 0.925329 |
 | 실행 환경 | Windows, Python 3.14.7, NumPy 2.5.4, scikit-learn 1.9.1 |
-| 회귀 검사 | 23개 통과 |
-| 추가 검수 | 전체 코퍼스의 인명·서명 잔존과 데이터 이용·재배포 조건 확인 대기 |
+| 회귀 검사 | 29개 통과 |
+| 추가 검수 | 배포 조건·불용어 채택 근거 확인, 전체 코퍼스 인명·서명 검수 대기 |
 
 수치의 근거는 [데이터 메타데이터](../../artifacts/dataset_metadata.json), [TF-IDF 검증](../../artifacts/tfidf_verification.json), [분류 지표](../../artifacts/classifier_metrics.json), [명령별 실행 기록](../../artifacts/verification_results.json)에 있습니다.
 
@@ -73,6 +73,8 @@ src/bonus/              TF 변형·BM25·역색인 비교
 기존 이슈 #1~#6은 단계별 요구사항의 근거이며, 해당 이슈의 모든 수락 기준을 완료했다고 일괄 판정하지 않습니다. 소스 통합 이슈 #7과 데이터 검수 이슈 #8을 연결해 실제 완료 근거를 추적합니다.
 
 ## 5. 검토할 문서
+
+후속 작업은 `feat/a4-1-data-review` 브랜치에서 첫 구현 수정 전에 계획 커밋 8979244를 기록했습니다. 데이터 3,787건 자동 검사와 공개 지표 생성 경로를 보완하고 정확한 Figshare 배포 항목의 CC BY 4.0 표기를 확인했습니다. [후속 실행 계획](../A4_1_data_review_plan.md), [출처 보고서](../A4_1_data_sources.md), [자동 검사 집계](../../artifacts/privacy_audit.json)
 
 구현과 실측 산출물의 변경 내역을 PR에서 검토할 수 있습니다. [구현 커밋 e3ff7e8](https://github.com/ntt65/A4_1/commit/e3ff7e8caf528324e099eb580665c9a5756cb53a), [PR #9](https://github.com/ntt65/A4_1/pull/9)
 

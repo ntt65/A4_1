@@ -1,4 +1,5 @@
 {
+  "schema_version": 2,
   "train_documents": 3029,
   "test_documents": 758,
   "target_names": [
@@ -536,7 +537,7 @@
     }
   ],
   "inverted_index": {
-    "build_seconds": 0.48335450000013225,
+    "build_seconds": 0.46332110000003013,
     "query_timing_scope": "score computation and Top-5 selection, excluding tokenization/vectorization",
     "timing_repeats": 3,
     "blas_threads": 2,
@@ -561,8 +562,8 @@
           2145,
           1725
         ],
-        "dense_query_ms": 29.228999999759253,
-        "inverted_query_ms": 0.3927999996449216
+        "dense_query_ms": 24.074599999948987,
+        "inverted_query_ms": 0.3283000005467329
       },
       {
         "query": "computer graphics rendering image",
@@ -582,8 +583,8 @@
           2515,
           884
         ],
-        "dense_query_ms": 25.756999999430263,
-        "inverted_query_ms": 0.3017999997609877
+        "dense_query_ms": 23.827399999390764,
+        "inverted_query_ms": 0.26280000020051375
       },
       {
         "query": "baseball pitcher season game",
@@ -603,8 +604,8 @@
           2398,
           621
         ],
-        "dense_query_ms": 22.897099999681814,
-        "inverted_query_ms": 0.273399999969115
+        "dense_query_ms": 23.299800000131654,
+        "inverted_query_ms": 0.27709999994840473
       },
       {
         "query": "middle east peace politics",
@@ -624,8 +625,8 @@
           2698,
           171
         ],
-        "dense_query_ms": 22.973699999965902,
-        "inverted_query_ms": 0.23669999973208178
+        "dense_query_ms": 22.322300000269024,
+        "inverted_query_ms": 0.23810000038793078
       },
       {
         "query": "",
@@ -633,8 +634,8 @@
         "top5_rank_equal": true,
         "dense_top5": [],
         "inverted_top5": [],
-        "dense_query_ms": 25.668100000075356,
-        "inverted_query_ms": 0.044499999603431206
+        "dense_query_ms": 22.36559999983001,
+        "inverted_query_ms": 0.04939999962516595
       },
       {
         "query": "zzzzunseenquerytoken",
@@ -642,8 +643,8 @@
         "top5_rank_equal": true,
         "dense_top5": [],
         "inverted_top5": [],
-        "dense_query_ms": 24.859299999661744,
-        "inverted_query_ms": 0.055700000302749686
+        "dense_query_ms": 22.7588999996442,
+        "inverted_query_ms": 0.04269999953976367
       },
       {
         "query": "space space satellite",
@@ -663,18 +664,26 @@
           1934,
           123
         ],
-        "dense_query_ms": 26.18990000064514,
-        "inverted_query_ms": 0.22820000049250666
+        "dense_query_ms": 22.739000000001397,
+        "inverted_query_ms": 0.2193000000261236
       }
     ]
   },
-  "published_excerpt_review": {
-    "export": "numeric metrics, labels, document IDs, and contribution values",
-    "removed_fields": [
-      "text",
-      "snippet",
-      "term"
+  "public_export": {
+    "included": [
+      "metrics",
+      "class_labels",
+      "public_queries",
+      "document_ids",
+      "scores",
+      "synthetic_toy_example"
     ],
-    "full_corpus_review_issue": "https://github.com/ntt65/A4_1/issues/8"
+    "excluded": [
+      "document_text",
+      "document_snippets",
+      "vocabulary_terms"
+    ],
+    "full_corpus_review": "pending",
+    "review_issue": "https://github.com/ntt65/A4_1/issues/8"
   }
 }

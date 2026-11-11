@@ -20,7 +20,9 @@
 
 ## 후속 작업
 
-전체 코퍼스의 인명·서명 검수와 데이터 이용·재배포 조건 확인을 진행해야 합니다. 코드와 측정 산출물 검토는 통합 이슈에서, 남은 데이터 검수는 후속 이슈에서 추적합니다. [통합 이슈 #7](https://github.com/ntt65/A4_1/issues/7), [검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
+이슈 #8은 `feat/a4-1-data-review` 브랜치를 생성하고 실행 계획을 첫 커밋 8979244로 기록한 뒤 진행했습니다. 정확한 Figshare 배포 항목의 CC BY 4.0 표기와 불용어 목록의 프로젝트 선정 근거를 확인했습니다. 분류·보너스 공개 JSON 생성 경로와 ZIP 검사를 보완했고 후속 회귀 검사 30개를 통과했습니다.
+
+사용 문서 3,787건의 자동 검사 집계를 기록했으며 전체 코퍼스의 인명·서명 수동 검수는 남아 있습니다. [후속 실행 계획](../A4_1_data_review_plan.md), [데이터 출처 보고서](../A4_1_data_sources.md), [자동 검사 집계](../../artifacts/privacy_audit.json), [검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
 
 커밋·푸시·PR 진행 상태는 [실행 체크표](docs_03_verification_and_checklists.md)에 기록합니다.
 

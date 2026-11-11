@@ -50,44 +50,50 @@ def train_and_evaluate_classifier(
         output_dict=True, zero_division=0,
     )
     errors = []
-    terms = None
     coefficients = clf.coef_
     intercepts = clf.intercept_
-    if vectorizer is not None:
-        terms = np.array(sorted(vectorizer.vocabulary_, key=vectorizer.vocabulary_.get))
-        if len(clf.classes_) == 2:
-            coefficients = np.vstack([-clf.coef_[0] / 2, clf.coef_[0] / 2])
-            intercepts = np.array([-clf.intercept_[0] / 2, clf.intercept_[0] / 2])
+    if vectorizer is not None and len(clf.classes_) == 2:
+        coefficients = np.vstack([-clf.coef_[0] / 2, clf.coef_[0] / 2])
+        intercepts = np.array([-clf.intercept_[0] / 2, clf.intercept_[0] / 2])
     for index in np.flatnonzero(y_pred != y_test)[:5]:
         example = {
             "test_doc_id": int(index),
             "actual": target_names[int(y_test[index])],
             "predicted": target_names[int(y_pred[index])],
-            "text": test_docs[index] if test_docs is not None else "",
         }
-        if terms is not None:
+        if vectorizer is not None:
             contribution = X_test[index] * (coefficients[y_pred[index]] - coefficients[y_test[index]])
             example["intercept_difference"] = float(intercepts[y_pred[index]] - intercepts[y_test[index]])
             example["decision_margin"] = float(contribution.sum() + example["intercept_difference"])
             positive = np.flatnonzero(contribution > 0)
             negative = np.flatnonzero(contribution < 0)
-            example["top_predicted_terms"] = [
-                {"term": str(terms[i]), "contribution": float(contribution[i])}
+            example["top_predicted_features"] = [
+                {"feature_id": int(i), "contribution": float(contribution[i])}
                 for i in positive[np.argsort(-contribution[positive])][:6]
             ]
-            example["top_actual_terms"] = [
-                {"term": str(terms[i]), "contribution": float(contribution[i])}
+            example["top_actual_features"] = [
+                {"feature_id": int(i), "contribution": float(contribution[i])}
                 for i in negative[np.argsort(contribution[negative])][:6]
             ]
         errors.append(example)
     metrics = {
+        "schema_version": 2,
         "accuracy": float(acc), "macro_f1": float(macro_f1),
         "correct": int(np.count_nonzero(y_pred == y_test)), "test_documents": len(y_test),
         "confusion_matrix": cm.tolist(), "target_names": list(target_names),
         "classification_report": report, "misclassified_examples": errors,
         "iterations": clf.n_iter_.tolist(),
+        "public_export": {
+            "included": ["metrics", "class_labels", "document_ids", "feature_ids", "numeric_contributions"],
+            "excluded": ["document_text", "document_snippets", "vocabulary_terms"],
+            "full_corpus_review": "pending",
+            "review_issue": "https://github.com/ntt65/A4_1/issues/8",
+        },
     }
-    output_img.with_name("classifier_metrics.json").write_text(
+    destination = output_img.with_name("classifier_metrics.json")
+    temporary = destination.with_suffix(".json.tmp")
+    temporary.write_text(
         json.dumps(metrics, indent=2, ensure_ascii=False), encoding="utf-8",
     )
+    temporary.replace(destination)
     return clf, acc, macro_f1, cm

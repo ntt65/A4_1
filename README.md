@@ -17,7 +17,7 @@ NumPy로 TF-IDF와 코사인 검색을 구현하고, 20 Newsgroups 네 카테고
 
 소문자화 후 `r'(?u)\b\w\w+\b'`로 두 글자 이상의 Unicode 단어 토큰을 추출합니다. 숫자와 밑줄도 단어 문자에 포함됩니다. 한 글자 `C`와 `C++` 같은 용어의 손실은 현재 규칙의 한계입니다. 동의어 치환은 적용하지 않습니다.
 
-고정 불용어 123개는 [stopwords_en.txt](resources/stopwords_en.txt)에 있습니다. 출처는 사용자가 제공한 소스의 목록이며 외부 목록의 원출처·버전은 제시되지 않았습니다. `no`, `nor`, `not`도 포함돼 부정 표현이 손실될 수 있습니다. 파일 경로는 모듈 위치를 기준으로 해 작업 디렉터리에 따라 규칙이 바뀌는 문제를 방지했습니다.
+고정 불용어 123개는 [stopwords_en.txt](resources/stopwords_en.txt)에 있습니다. 사용자 제공 소스의 목록을 프로젝트 기준 `a4-1-en-v1`로 채택하고 기능어 제거의 선정 근거와 UTF-8·LF 정규화 해시를 기록했습니다. 외부 목록의 원출처·버전은 제공되지 않았습니다. `no`, `nor`, `not`도 포함돼 부정 표현이 손실될 수 있습니다. 파일 경로는 모듈 위치를 기준으로 합니다. [목록 선정 근거와 해시](docs/A4_1_data_sources.md)
 
 어휘 33,297개와 IDF는 Train에서만 학습합니다. Test와 질의에는 학습된 어휘·IDF를 그대로 사용하고 OOV는 제외합니다. 데이터 분포와 코퍼스 SHA-256은 [데이터 메타데이터](artifacts/dataset_metadata.json)에 기록했습니다.
 
@@ -178,11 +178,21 @@ Classification Accuracy: 92.4802% | Macro-F1: 0.925329
 
 sklearn 문서는 헤더 등 메타데이터가 분류 성능에 영향을 줄 수 있음을 설명합니다. 현재 구현은 헤더·푸터·인용 제거와 이메일·일반 전화번호 마스킹을 수행합니다. 실제 결과에 서명과 인명이 남아 있어 미션의 개인정보 미포함 조건에 대한 추가 검수가 필요합니다. 원본 데이터는 자동 다운로드 캐시에 보관합니다. [sklearn 데이터셋 설명](https://scikit-learn.org/stable/datasets/real_world.html#the-20-newsgroups-text-dataset)
 
-원본 배포처는 Jason Rennie의 20 Newsgroups 페이지입니다. 2026-11-12 확인 과정에서 배포처 리다이렉트 이후 페이지에 접근하지 못해 상세 이용·재배포 조건은 미확인으로 기록했습니다. sklearn 코드 라이선스를 데이터셋 라이선스로 대신 적용하지 않습니다. [원본 배포처 안내](https://people.csail.mit.edu/jrennie/20Newsgroups/)
+실제 sklearn 다운로드 파일과 일치하는 Figshare file ID `5975967`, 항목 `3829962` 버전 2에서 CC BY 4.0 표기를 확인했습니다. 출처 표기는 Nelson Liu, 2016, `scikit-learn 20newsgroups dataset 20news-bydate.tar.gz`, version 2, Figshare입니다. 네 카테고리 선택·메타데이터 제거·마스킹·빈 문서 제외·재분할·수치 변환의 변경 내용을 출처 보고서에 기록했습니다. [배포 기록 DOI](https://doi.org/10.6084/m9.figshare.3829962.v2), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), [출처와 이용 조건 보고서](docs/A4_1_data_sources.md)
+
+후속 자동 검사에서 사용 데이터 3,787건의 이메일·지정 전화번호 패턴은 0건이었습니다. 대문자 단어 조합 후보는 18,426개가 2,292개 문서에서 검출됐으며 제목·기관명도 포함합니다. 이 검사는 소문자 인명이나 다른 식별 정보를 놓칠 수 있어 전체 개인정보 검수는 진행 대기 상태입니다. 공개 보고서에는 집계만 기록하고 검토용 문맥은 Git에서 제외되는 `artifacts/private_review/`에 저장합니다. [자동 검사 보고서](artifacts/privacy_audit.json)
 
 [미션 PDF](docs/A4_1_mission.pdf), [평가 PDF](docs/A4_1_eval.pdf), [평가 대비 Q&A](docs/A4_1_mission_QnA.md), [발표 개요](docs/A4_1_presentation_outline.md)를 함께 확인할 수 있습니다.
 
-공개 측정 JSON은 문서 본문·스니펫·원본 기여 단어 필드를 제외하고 수치·레이블·문서 ID·기여도 값을 제공합니다. 검색 출력 파일도 점수와 문서 ID로 구성했습니다. README와 평가 문서에는 검토한 비식별 발췌와 기여 단어를 사용했습니다. 전체 코퍼스 검수는 후속 이슈에서 추적합니다. [통합 작업 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 #8](https://github.com/ntt65/A4_1/issues/8)
+분류·보너스 JSON 생성기는 스키마 버전 2에서 수치·레이블·문서 ID·기여도 값을 저장합니다. 분류 설명은 `feature_id`로 연결하며 본문·스니펫·원본 기여 단어를 저장하는 경로를 제거했습니다. 공개 검색 출력 파일은 점수와 문서 ID로 구성했고, 로컬 CLI는 미션의 스니펫 출력을 지원합니다. README와 평가 문서에는 검토한 비식별 발췌와 기여 단어를 사용했습니다. [통합 작업 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 #8](https://github.com/ntt65/A4_1/issues/8)
+
+검사와 패키지 생성은 다음 명령으로 재현합니다. `audit_data.py`는 검사 집계와 로컬 검토 후보를 생성하고, `package_project.py`는 공개 지표 검사 후 지정한 파일로 ZIP을 생성합니다. 회귀 검사는 29개를 통과했습니다. [후속 실행 계획](docs/A4_1_data_review_plan.md)
+
+```bash
+python audit_data.py
+python audit_data.py --check-public
+python package_project.py
+```
 
 작업 개요·단계별 계획·실행 체크표와 GitHub 전달 상태를 다음 문서에 연결했습니다. [개요와 아키텍처](docs/repo_readme/docs_01_system_architecture_and_plan.md), [상세 계획](IMPLEMENTATION_PLAN.md), [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md), [진행 이력](docs/repo_readme/docs_04_development_log_timeline.md)
 
@@ -214,4 +224,4 @@ $k_1=1.5$, $b=0.75$이며 반복 질의 단어는 반복 횟수만큼 기여합�
 
 역색인은 단어 ID를 `(doc_id, normalized_tfidf_weight)` posting으로 연결합니다. 네 주제 질의와 빈 입력·OOV·반복 단어 질의까지 총 7개에서 dense 전체 스캔 대비 최대 점수 오차 **0**, Top-5 순위 일치율 **100%**를 확인했습니다.
 
-인덱스 구축은 **0.483355초**였습니다. 우주 질의의 점수 계산과 Top-5 선택은 dense **29.229ms**, 역색인 **0.393ms**였습니다. 토큰화·벡터화 시간은 제외했고 BLAS 2스레드, 워밍업 후 3회 중앙값입니다. 다른 환경이나 전체 질의 분포의 지연은 추가 측정이 필요합니다. 역색인의 계산 비용은 조회 posting 수와 후보 정렬에 의존하며 자주 등장하는 단어는 후보가 많아질 수 있습니다.
+인덱스 구축은 **0.463321초**였습니다. 우주 질의의 점수 계산과 Top-5 선택은 dense **24.0746ms**, 역색인 **0.3283ms**였습니다. 토큰화·벡터화 시간은 제외했고 BLAS 2스레드, 워밍업 후 3회 중앙값입니다. 다른 환경이나 전체 질의 분포의 지연은 추가 측정이 필요합니다. 역색인의 계산 비용은 조회 posting 수와 후보 정렬에 의존하며 자주 등장하는 단어는 후보가 많아질 수 있습니다.

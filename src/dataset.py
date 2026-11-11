@@ -43,6 +43,11 @@ def load_data(random_state=42):
         "test_counts": np.bincount(y_test).tolist(),
         "corpus_sha256": hashlib.sha256("\0".join(docs).encode("utf-8")).hexdigest(),
         "privacy_review": "Email and common telephone masking only. Manual name review pending.",
+        "source_manifest": "resources/data_sources.json",
+        "data_source": json.loads((ROOT / "resources" / "data_sources.json").read_text(encoding="utf-8"))["dataset"],
+        "stopwords_normalized_sha256": hashlib.sha256(
+            ((ROOT / "resources" / "stopwords_en.txt").read_text(encoding="utf-8").rstrip() + "\n").encode("utf-8")
+        ).hexdigest(),
     }
     output = ROOT / "artifacts" / "dataset_metadata.json"
     output.parent.mkdir(parents=True, exist_ok=True)

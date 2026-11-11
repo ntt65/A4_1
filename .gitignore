@@ -12,3 +12,4 @@ __pycache__/
 .pytest_cache/
 artifacts/data_cache/
 artifacts/index.pkl
+artifacts/private_review/
