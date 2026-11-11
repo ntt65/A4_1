@@ -8,6 +8,8 @@ NumPy로 TF-IDF와 코사인 검색을 구현하고, 20 Newsgroups 네 카테고
 
 Git 관리·이슈 동기화 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. 기존 이슈 정의는 `docs/github_issues.json`에 있으며 `python create_github_issues.py`는 기본적으로 오프라인 미리보기를 출력합니다.
 
+현재 구현·검증·Git 관리 변경은 `main` 대상 통합 PR #12에서 검토합니다. PR #9·#10은 전체 변경 포함을 확인한 뒤 #12로 대체 종료했습니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12)
+
 ### 데이터와 전처리
 
 `comp.graphics`, `rec.sport.baseball`, `sci.space`, `talk.politics.mideast`의 원본 3,894건을 사용했습니다. `headers`, `footers`, `quotes`를 제거하고 이메일과 일반적인 전화번호 형식을 마스킹했습니다. 공백만 남은 107건을 제외해 3,787건을 확보했습니다. `train_test_split(test_size=0.2, random_state=42, stratify=labels)`로 Train 3,029건, Test 758건을 고정했습니다. 이번 분할에서 Train/Test 사이 완전히 동일한 본문은 0건입니다.
@@ -190,7 +192,7 @@ sklearn 문서는 헤더 등 메타데이터가 분류 성능에 영향을 줄 �
 
 분류·보너스 JSON 생성기는 스키마 버전 2에서 수치·레이블·문서 ID·기여도 값을 저장합니다. 분류 설명은 `feature_id`로 연결하며 본문·스니펫·원본 기여 단어를 저장하는 경로를 제거했습니다. 공개 검색 출력 파일은 점수와 문서 ID로 구성했고, 로컬 CLI는 미션의 스니펫 출력을 지원합니다. README와 평가 문서에는 검토한 비식별 발췌와 기여 단어를 사용했습니다. [통합 작업 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 #8](https://github.com/ntt65/A4_1/issues/8)
 
-검사와 패키지 생성은 다음 명령으로 재현합니다. `audit_data.py`는 검사 집계와 로컬 검토 후보를 생성하고, `package_project.py`는 공개 지표 검사 후 지정한 파일로 ZIP을 생성합니다. 회귀 검사는 29개를 통과했습니다. [후속 실행 계획](docs/A4_1_data_review_plan.md)
+검사와 패키지 생성은 다음 명령으로 재현합니다. `audit_data.py`는 검사 집계와 로컬 검토 후보를 생성하고, `package_project.py`는 공개 지표 검사 후 지정한 파일로 ZIP을 생성합니다. Git 관리 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. [후속 실행 계획](docs/A4_1_data_review_plan.md)
 
 ```bash
 python audit_data.py

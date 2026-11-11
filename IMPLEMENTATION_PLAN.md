@@ -1,5 +1,7 @@
 # [A4_1] TF-IDF 기반 지능형 문서 검색기 & 분류 시스템 구현 계획 (개정안)
 
+현재 통합 검토 경로는 `chore/a4-1-git-workflow`에서 `main`으로 향하는 PR #12입니다. 아래 PR #9·#10 기록은 단계별 작업 이력이며, 두 PR의 모든 변경을 확인한 뒤 #12로 대체 종료하고 중복 브랜치를 정리했습니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12), [Git 관리 정리 계획](docs/git_workflow_repair_plan.md)
+
 **NumPy 기반 벡터 연산**으로 TF-IDF, 코사인 유사도 검색, TF 변형 및 BM25를 직접 구현하고, 역색인으로 검색을 가속합니다. 데이터 로딩, 분류 모델(Logistic Regression), 평가 및 참조 검증에는 Scikit-learn을 사용합니다. TF-IDF 최대 절대 오차 $10^{-6}$ 미만 검증과 학습·시험 데이터 분리를 구현 기준으로 삼습니다.
 
 ## 2026-11-12 실행 계획 및 진행 현황
@@ -17,7 +19,7 @@
 | 7 | 데이터 개인정보·이용 조건 검수 | 부분 완료 | 배포 조건·불용어 근거·자동 검사·공개 생성 경로 확인, 전체 인명 검수는 이슈 #8 |
 | 8 | 작업 브랜치 커밋·푸시·PR | 완료 | 구현 커밋 e3ff7e8, 원격 푸시, main 대상 PR #9 |
 
-실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. 회귀 검사 29개와 요청된 네 CLI 명령을 통과했습니다.
+실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. Git 관리 검사를 포함한 전체 회귀 검사 50개와 요청된 네 CLI 명령을 통과했습니다.
 
 현재 환경은 Python 3.14.7과 고정된 설치 패키지 조합입니다. 제공 소스의 구버전 의존성 범위를 현재 환경에 맞추고, 누락 import·초기화 파일명·실패 종료 코드·보너스 검증을 보완했습니다. 공통 analyzer의 실제 진입점은 `TextPreprocessor.tokenize`입니다.
 

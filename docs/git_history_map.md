@@ -42,6 +42,7 @@
 | 78c399c | 공개 지표 생성 경로, 출처·이용 조건, 로컬 자동 검사 보완 | #8, audit_data.py·package_project.py·출처 보고서·공개 스키마 2 |
 | 5e76937 | PR #10과 전달 결과 기록 | #8, 데이터 검수 계획·실행 체크표 |
 | ee933fa | Git 관리 정리의 개요·계획·완료 기준 기록 | #11, git_workflow_repair_plan.md |
+| 450122a | 이슈 동기화 도구·커밋 검사·Git 관리 문서와 회귀 검사 보완 | #11, create_github_issues.py·docs/github_issues.json·.githooks·scripts·tests, #1~#6 참조 |
 
 이슈 #1~#6의 번호는 기존 요구사항을 따라 유지합니다. #5는 문서·패키징, #6은 보너스입니다. 이슈 #8의 전체 인명·서명 검수는 미완료 상태로 추적합니다. [통합 이슈 #7](https://github.com/ntt65/A4_1/issues/7), [검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8), [정리 이슈 #11](https://github.com/ntt65/A4_1/issues/11)
 
@@ -52,6 +53,6 @@
 - [x] 구현 이후 커밋을 이슈·산출물과 연결
 - [x] AI Studio 프로젝트의 저장소 연결 해제와 화면 결과 기록
 - [x] 기존 공개 이력을 보존하는 새 커밋·추적표 중심의 정리 범위 기록
-- [ ] 통합 PR의 번호와 기존 PR 정리 결과 기록
+- [x] 통합 PR #12와 기존 PR #9·#10 대체 종료, 중복 브랜치 참조 정리 기록
 
-현재 작업은 기존 공개 이력을 보존하고 새 변경을 이슈 번호가 연결된 커밋으로 기록합니다. `main` 대상 통합 PR이 생성되고 변경 반영을 확인한 뒤 기존 PR #9·#10의 대체 관계를 갱신합니다. 현재 정리 작업의 판단과 최종 PR은 [실행 계획](git_workflow_repair_plan.md)에 기록합니다. [로컬 Git 작업 절차](GIT_WORKFLOW.md)
+현재 작업은 기존 공개 이력을 보존하고 새 변경을 이슈 번호가 연결된 커밋으로 기록합니다. `main` 대상 PR #12에 기존 PR #9·#10의 모든 커밋이 포함됨을 확인하고 두 PR을 대체 종료했습니다. 기존 두 브랜치의 정확한 HEAD와 포함 관계를 검사한 뒤 중복 브랜치 참조를 정리했습니다. 현재 정리 작업의 판단과 최종 PR은 실행 계획에서 확인합니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12), [실행 계획](git_workflow_repair_plan.md), [로컬 Git 작업 절차](GIT_WORKFLOW.md)
