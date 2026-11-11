@@ -14,12 +14,15 @@ def build_package():
     files = [ROOT / name for name in (
         ".gitignore", "AGENTS.md", "README.md", "requirements.txt",
         "main.py", "verify_tfidf.py", "audit_data.py", "package_project.py",
+        "create_github_issues.py", ".gitattributes", ".githooks/commit-msg",
         "IMPLEMENTATION_PLAN.md", "docs/A4_1_mission.pdf", "docs/A4_1_eval.pdf",
         "docs/A4_1_mission_QnA.md", "docs/A4_1_presentation_outline.md",
         "docs/A4_1_data_sources.md", "docs/A4_1_data_review_plan.md",
+        "docs/GIT_WORKFLOW.md", "docs/git_history_map.md",
+        "docs/git_workflow_repair_plan.md", "docs/github_issues.json",
     )]
     for directory, pattern in (
-        ("src", "**/*.py"), ("tests", "*.py"),
+        ("src", "**/*.py"), ("tests", "*.py"), ("scripts", "*.py"),
         ("resources", "*.txt"), ("resources", "*.json"),
         ("docs/repo_readme", "*.md"),
     ):

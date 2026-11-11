@@ -14,3 +14,13 @@
 작업 완료 후 브랜치를 뒤늦게 만드는 순서를 반복하지 않습니다. 이미 허용받은 GitHub 이슈·커밋·푸시·PR 작업은 매 단계에서 사용자에게 다시 지시를 요청하지 않고 이어갑니다.
 
 완료 체크는 실제 실행·검사 근거가 있을 때 표시합니다. 해결되지 않은 사항은 해당 이슈와 체크표에 남깁니다.
+
+## Git 관리 주체와 추적
+
+AI Studio는 UI 프로토타입·시연과 아이디어 확인에 사용합니다. 이 저장소의 커밋·이슈 동기화·원격 푸시·PR 관리는 로컬 작업 브랜치와 GitHub 연결 도구에서 수행합니다. AI Studio의 A4_1 프로젝트 GitHub 연결은 2026-11-12 해제했습니다.
+
+커밋 메시지는 `feat: ... (#번호)`, `fix: ... (#번호)`, `docs: ... (#번호)` 등 Conventional Commit 형식을 사용하고 관련 이슈를 연결합니다. 저장소의 커밋 검사는 `.githooks/commit-msg`와 `scripts/check_commit_message.py`를 사용합니다.
+
+이슈 정의는 `docs/github_issues.json`에 관리하고 `create_github_issues.py`의 기본 미리보기로 변경 범위를 확인합니다. GitHub 적용은 허용된 작업 범위에서 명시적으로 실행하고, 기존 이슈를 조회해 중복 발행을 방지합니다.
+
+현재 검토 경로와 과거 커밋의 근거는 `docs/GIT_WORKFLOW.md`, `docs/git_history_map.md`, `docs/git_workflow_repair_plan.md`에서 관리합니다.

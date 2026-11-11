@@ -4,6 +4,10 @@ NumPy로 TF-IDF와 코사인 검색을 구현하고, 20 Newsgroups 네 카테고
 
 ## 1. 구현 요약
 
+코드·문서·커밋·이슈·PR은 로컬 작업 브랜치와 GitHub에서 관리합니다. AI Studio의 A4_1 프로젝트 GitHub 연결은 2026-11-12 해제했습니다. 기본 브랜치와 작업 브랜치, 과거 커밋의 목적 및 현재 검토 경로는 관리 문서에 기록했습니다. [Git 작업 절차](docs/GIT_WORKFLOW.md), [공개 이력 추적표](docs/git_history_map.md), [정리 실행 계획](docs/git_workflow_repair_plan.md)
+
+Git 관리·이슈 동기화 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. 기존 이슈 정의는 `docs/github_issues.json`에 있으며 `python create_github_issues.py`는 기본적으로 오프라인 미리보기를 출력합니다.
+
 ### 데이터와 전처리
 
 `comp.graphics`, `rec.sport.baseball`, `sci.space`, `talk.politics.mideast`의 원본 3,894건을 사용했습니다. `headers`, `footers`, `quotes`를 제거하고 이메일과 일반적인 전화번호 형식을 마스킹했습니다. 공백만 남은 107건을 제외해 3,787건을 확보했습니다. `train_test_split(test_size=0.2, random_state=42, stratify=labels)`로 Train 3,029건, Test 758건을 고정했습니다. 이번 분할에서 Train/Test 사이 완전히 동일한 본문은 0건입니다.

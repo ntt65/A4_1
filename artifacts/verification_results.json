@@ -71,5 +71,17 @@
     "source_manifest": "resources/data_sources.json",
     "data_audit": "artifacts/privacy_audit.json",
     "remaining": "Full corpus manual name and signature review"
+  },
+  "git_workflow_verification": {
+    "checked_at": "2026-11-12T08:38:37.034770+09:00",
+    "issue": 11,
+    "regression_tests_passed": 50,
+    "issue_catalog": "docs/github_issues.json",
+    "issue_catalog_preview": "offline PASS",
+    "commit_hook_path": ".githooks",
+    "commit_hook_valid_and_invalid_tests": "PASS",
+    "ai_studio_project_github_link": "disconnected and UI verified",
+    "history_policy": "preserve published commits and add trace map",
+    "history_map": "docs/git_history_map.md"
   }
 }
