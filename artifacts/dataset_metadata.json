@@ -1,0 +1,28 @@
+{
+  "raw_documents": 3894,
+  "documents": 3787,
+  "removed_empty": 107,
+  "train_documents": 3029,
+  "test_documents": 758,
+  "target_names": [
+    "comp.graphics",
+    "rec.sport.baseball",
+    "sci.space",
+    "talk.politics.mideast"
+  ],
+  "random_state": 42,
+  "train_counts": [
+    764,
+    766,
+    764,
+    735
+  ],
+  "test_counts": [
+    191,
+    192,
+    191,
+    184
+  ],
+  "corpus_sha256": "56c82569138106bb0cc167ec4c880d1beb41645758f4dffd9acbf60f78ad21de",
+  "privacy_review": "Email and common telephone masking only. Manual name review pending."
+}

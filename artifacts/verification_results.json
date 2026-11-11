@@ -1,0 +1,62 @@
+{
+  "verified_at": "2026-11-12T07:49:31.228495+09:00",
+  "python": "3.14.7",
+  "commands": [
+    {
+      "command": [
+        "python",
+        "verify_tfidf.py"
+      ],
+      "exit_code": 0,
+      "log": "artifacts/run_logs/verify_tfidf.txt"
+    },
+    {
+      "command": [
+        "python",
+        "main.py",
+        "--query",
+        "space satellite launch orbit",
+        "--topk",
+        "5"
+      ],
+      "exit_code": 0,
+      "log": "artifacts/run_logs/search.txt"
+    },
+    {
+      "command": [
+        "python",
+        "main.py",
+        "--train-classifier"
+      ],
+      "exit_code": 0,
+      "log": "artifacts/run_logs/classifier.txt"
+    },
+    {
+      "command": [
+        "python",
+        "main.py",
+        "--bonus"
+      ],
+      "exit_code": 0,
+      "log": "artifacts/run_logs/bonus.txt"
+    }
+  ],
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.5.4",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2",
+    "seaborn": "0.13.2",
+    "scipy": "1.18.1",
+    "threadpoolctl": "3.8.0"
+  },
+  "regression_tests": {
+    "command": "python -m unittest discover -s tests -v",
+    "passed": 23
+  },
+  "index_reload_function_api": "PASS: saved index Top-5 and OOV query checked",
+  "limitations": [
+    "Full corpus personal-name review pending",
+    "Dataset usage and redistribution terms unconfirmed"
+  ]
+}

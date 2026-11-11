@@ -1,0 +1,14 @@
+$ python main.py --bonus
+exit_code=0
+Train=3029 Test=758 Vocabulary=33297
+[TF variant] raw
+  Accuracy=0.924802, Macro-F1=0.925329
+[TF variant] log
+  Accuracy=0.924802, Macro-F1=0.925139
+[TF variant] double
+  Accuracy=0.919525, Macro-F1=0.919962
+BM25 Toy Max Absolute Error: 2.2204e-16
+Inverted Index Max Absolute Error: 0.0000e+00
+Top-5 rank match: 100%
+Index build: 0.483355s
+Bonus measurements saved to D:\git\A4_1\artifacts\bonus_metrics.json

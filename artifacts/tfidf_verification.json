@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "threshold": 1e-06,
+  "idf_max_error": 0.0,
+  "settings": {
+    "smooth_idf": true,
+    "sublinear_tf": false,
+    "norm": "l2",
+    "dtype": "float64",
+    "analyzer": "TextPreprocessor.tokenize"
+  },
+  "groups": {
+    "train": {
+      "shape": [
+        3029,
+        33297
+      ],
+      "max_absolute_error": 2.3314683517128287e-15,
+      "mean_absolute_error": 3.056800952156508e-20
+    },
+    "test": {
+      "shape": [
+        758,
+        33297
+      ],
+      "max_absolute_error": 8.326672684688674e-16,
+      "mean_absolute_error": 2.2134100874712442e-20
+    },
+    "queries": {
+      "shape": [
+        5,
+        33297
+      ],
+      "max_absolute_error": 0.0,
+      "mean_absolute_error": 0.0
+    }
+  }
+}
