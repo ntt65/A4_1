@@ -14,7 +14,7 @@
 | 보너스 검증 | Raw·Log·Double TF, BM25 수작업 비교, 역색인 비교 | Toy 오차 2.2204e-16, 7개 질의 Top-5 순위 일치 |
 | 회귀 검사 | 전처리·TF-IDF·검색·인덱스·보너스 경계 조건 | 23개 통과 |
 | 산출물 정리 | README, Q&A, 발표 개요, 실측 JSON·로그·혼동 행렬·소스 ZIP | 문서 링크·코드 예제·ZIP 검사 통과 |
-| GitHub 작업 | 작업 브랜치와 통합·후속 검수 이슈 생성 | feat/a4-1-nlp-verification, #7, #8 |
+| GitHub 작업 | 작업 브랜치, 통합·후속 검수 이슈, 구현 커밋, 원격 푸시와 PR 생성 | feat/a4-1-nlp-verification, #7, #8, e3ff7e8, PR #9 |
 
 실행 시각과 환경, 명령별 결과는 [검증 기록](../../artifacts/verification_results.json)에 있습니다. 이전 AI Studio 문서에 기록된 97.56%, 0.9758 및 1.1102e-15는 선행 보고값으로 보존된 이력이며, 이번 로컬 실측값은 위 표와 README에 기록했습니다.
 
@@ -23,3 +23,5 @@
 전체 코퍼스의 인명·서명 검수와 데이터 이용·재배포 조건 확인을 진행해야 합니다. 코드와 측정 산출물 검토는 통합 이슈에서, 남은 데이터 검수는 후속 이슈에서 추적합니다. [통합 이슈 #7](https://github.com/ntt65/A4_1/issues/7), [검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
 
 커밋·푸시·PR 진행 상태는 [실행 체크표](docs_03_verification_and_checklists.md)에 기록합니다.
+
+구현 커밋과 PR을 통해 변경 내역을 검토할 수 있습니다. [구현 커밋 e3ff7e8](https://github.com/ntt65/A4_1/commit/e3ff7e8caf528324e099eb580665c9a5756cb53a), [PR #9](https://github.com/ntt65/A4_1/pull/9)

@@ -15,13 +15,15 @@
 | 5 | M6 TF 변형·BM25·역색인 | 완료 | BM25 Toy 오차 2.2204e-16, 역색인 7개 질의 Top-5 100% 일치 |
 | 6 | M5 평가 문서·실행 패키지 | 작성·검사 완료 | README 3단 구성, Q&A, 발표 개요, 소스 ZIP |
 | 7 | 데이터 개인정보·이용 조건 검수 | 후속 작업 | 이슈 #8 |
-| 8 | 작업 브랜치 커밋·푸시·PR | 진행 중 | 커밋 및 PR 발행 후 실행 체크표 갱신 |
+| 8 | 작업 브랜치 커밋·푸시·PR | 완료 | 구현 커밋 e3ff7e8, 원격 푸시, main 대상 PR #9 |
 
 실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. 회귀 검사 23개와 요청된 네 CLI 명령을 통과했습니다.
 
 현재 환경은 Python 3.14.7과 고정된 설치 패키지 조합입니다. 제공 소스의 구버전 의존성 범위를 현재 환경에 맞추고, 누락 import·초기화 파일명·실패 종료 코드·보너스 검증을 보완했습니다. 공통 analyzer의 실제 진입점은 `TextPreprocessor.tokenize`입니다.
 
 전체 코퍼스의 인명·서명 검수, 데이터 이용·재배포 조건, 불용어 목록의 원출처 확인은 후속 이슈에서 진행합니다. [데이터 검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
+
+구현과 산출물의 검토는 PR에서 진행합니다. [구현 커밋 e3ff7e8](https://github.com/ntt65/A4_1/commit/e3ff7e8caf528324e099eb580665c9a5756cb53a), [PR #9](https://github.com/ntt65/A4_1/pull/9)
 
 ---
 

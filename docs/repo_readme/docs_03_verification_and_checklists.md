@@ -69,8 +69,10 @@
 - [x] 소스 복원·실측 검증·문서 통합 이슈 #7 발행
 - [x] 남은 데이터 검수와 이용 조건 확인 이슈 #8 발행
 - [x] 개요·상세 계획·실행 체크표에 실제 수치와 이슈 연결
-- [ ] 검토할 코드·문서·검증 산출물 커밋
-- [ ] 작업 브랜치 원격 푸시
-- [ ] `main` 대상 PR 생성 및 이슈·검증 근거 연결
+- [x] 검토할 코드·문서·검증 산출물 커밋 e3ff7e8
+- [x] 작업 브랜치 원격 푸시
+- [x] `main` 대상 PR #9 생성 및 이슈·검증 근거 연결
 
-커밋·푸시·PR 항목은 실제 GitHub 작업 결과를 확인한 뒤 갱신합니다. [개요와 아키텍처](docs_01_system_architecture_and_plan.md), [상세 구현 계획](../../IMPLEMENTATION_PLAN.md)
+구현 커밋과 원격 브랜치, PR 생성 결과를 확인해 전달 항목을 완료 처리했습니다. 공개 측정 JSON과 검색 출력에는 원문 본문·스니펫·원본 기여 단어 필드를 제외했습니다. 전체 코퍼스 검수는 #8에서 추적합니다. [구현 커밋 e3ff7e8](https://github.com/ntt65/A4_1/commit/e3ff7e8caf528324e099eb580665c9a5756cb53a), [PR #9](https://github.com/ntt65/A4_1/pull/9)
+
+[개요와 아키텍처](docs_01_system_architecture_and_plan.md), [상세 구현 계획](../../IMPLEMENTATION_PLAN.md)

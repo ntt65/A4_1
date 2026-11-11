@@ -68,11 +68,13 @@ src/bonus/              TF 변형·BM25·역색인 비교
 | M4 / #4 | 분류·혼동 행렬·실제 오분류 5건 | `src/classifier.py`, 분류 지표, 혼동 행렬, README 분석 | 완료 |
 | M6 / #6 | Raw·Log·Double TF·BM25·역색인 | `src/bonus/`, 보너스 지표·출력 | 완료 |
 | M5 / #5 | 평가 문서·실행 안내·패키지 | README, Q&A, 발표 개요, requirements | 로컬 작성·검증 완료 |
-| GitHub 작업 / #7 | 작업 브랜치·이슈·커밋·PR 연결 | 브랜치와 이슈 생성 완료 | 커밋·푸시·PR 진행 중 |
+| GitHub 작업 / #7 | 작업 브랜치·이슈·커밋·PR 연결 | 구현 커밋 e3ff7e8, 작업 브랜치 원격 푸시, main 대상 PR #9 | 전달 완료, PR 검토 진행 |
 
 기존 이슈 #1~#6은 단계별 요구사항의 근거이며, 해당 이슈의 모든 수락 기준을 완료했다고 일괄 판정하지 않습니다. 소스 통합 이슈 #7과 데이터 검수 이슈 #8을 연결해 실제 완료 근거를 추적합니다.
 
 ## 5. 검토할 문서
+
+구현과 실측 산출물의 변경 내역을 PR에서 검토할 수 있습니다. [구현 커밋 e3ff7e8](https://github.com/ntt65/A4_1/commit/e3ff7e8caf528324e099eb580665c9a5756cb53a), [PR #9](https://github.com/ntt65/A4_1/pull/9)
 
 - [상세 구현 계획](../../IMPLEMENTATION_PLAN.md)
 - [실행 체크표와 실측 결과](docs_03_verification_and_checklists.md)
