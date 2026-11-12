@@ -1,0 +1,317 @@
+{
+  "schema_version": 2,
+  "accuracy": 0.924802110817942,
+  "macro_f1": 0.9253286504902738,
+  "correct": 701,
+  "test_documents": 758,
+  "confusion_matrix": [
+    [
+      179,
+      4,
+      8,
+      0
+    ],
+    [
+      4,
+      177,
+      10,
+      1
+    ],
+    [
+      5,
+      5,
+      178,
+      3
+    ],
+    [
+      1,
+      8,
+      8,
+      167
+    ]
+  ],
+  "target_names": [
+    "comp.graphics",
+    "rec.sport.baseball",
+    "sci.space",
+    "talk.politics.mideast"
+  ],
+  "classification_report": {
+    "comp.graphics": {
+      "precision": 0.9470899470899471,
+      "recall": 0.93717277486911,
+      "f1-score": 0.9421052631578948,
+      "support": 191.0
+    },
+    "rec.sport.baseball": {
+      "precision": 0.9123711340206185,
+      "recall": 0.921875,
+      "f1-score": 0.917098445595855,
+      "support": 192.0
+    },
+    "sci.space": {
+      "precision": 0.8725490196078431,
+      "recall": 0.9319371727748691,
+      "f1-score": 0.9012658227848102,
+      "support": 191.0
+    },
+    "talk.politics.mideast": {
+      "precision": 0.9766081871345029,
+      "recall": 0.907608695652174,
+      "f1-score": 0.9408450704225352,
+      "support": 184.0
+    },
+    "accuracy": 0.924802110817942,
+    "macro avg": {
+      "precision": 0.9271545719632279,
+      "recall": 0.9246484108240383,
+      "f1-score": 0.9253286504902738,
+      "support": 758.0
+    },
+    "weighted avg": {
+      "precision": 0.9266783730923288,
+      "recall": 0.924802110817942,
+      "f1-score": 0.9251745012232285,
+      "support": 758.0
+    }
+  },
+  "misclassified_examples": [
+    {
+      "test_doc_id": 3,
+      "actual": "talk.politics.mideast",
+      "predicted": "sci.space",
+      "intercept_difference": 0.24608200243726525,
+      "decision_margin": 0.012344362070372927,
+      "top_predicted_features": [
+        {
+          "feature_id": 15423,
+          "contribution": 0.2409305076513161
+        },
+        {
+          "feature_id": 28266,
+          "contribution": 0.09139081884201032
+        },
+        {
+          "feature_id": 12488,
+          "contribution": 0.07884023703863567
+        },
+        {
+          "feature_id": 3572,
+          "contribution": 0.05140468549152517
+        },
+        {
+          "feature_id": 18280,
+          "contribution": 0.043605989727116115
+        },
+        {
+          "feature_id": 9532,
+          "contribution": 0.04177362239534494
+        }
+      ],
+      "top_actual_features": [
+        {
+          "feature_id": 22063,
+          "contribution": -0.3579732149177813
+        },
+        {
+          "feature_id": 23118,
+          "contribution": -0.14448868179193305
+        },
+        {
+          "feature_id": 17447,
+          "contribution": -0.14135362946396582
+        },
+        {
+          "feature_id": 24544,
+          "contribution": -0.0927442328363212
+        },
+        {
+          "feature_id": 12734,
+          "contribution": -0.05669067068662668
+        },
+        {
+          "feature_id": 7722,
+          "contribution": -0.05401800571465378
+        }
+      ]
+    },
+    {
+      "test_doc_id": 5,
+      "actual": "comp.graphics",
+      "predicted": "sci.space",
+      "intercept_difference": 0.13028533083220814,
+      "decision_margin": 0.4277560840831387,
+      "top_predicted_features": [
+        {
+          "feature_id": 29280,
+          "contribution": 0.1815039884691878
+        },
+        {
+          "feature_id": 4745,
+          "contribution": 0.09349690105074149
+        },
+        {
+          "feature_id": 8328,
+          "contribution": 0.07227118814328692
+        },
+        {
+          "feature_id": 25459,
+          "contribution": 0.06939986717092585
+        },
+        {
+          "feature_id": 17782,
+          "contribution": 0.0020639092193952724
+        }
+      ],
+      "top_actual_features": [
+        {
+          "feature_id": 24200,
+          "contribution": -0.11625146529323303
+        },
+        {
+          "feature_id": 296,
+          "contribution": -0.005013635509373693
+        }
+      ]
+    },
+    {
+      "test_doc_id": 13,
+      "actual": "comp.graphics",
+      "predicted": "rec.sport.baseball",
+      "intercept_difference": 0.053201129312646984,
+      "decision_margin": 0.2198689200159842,
+      "top_predicted_features": [
+        {
+          "feature_id": 28484,
+          "contribution": 0.21217436060734357
+        },
+        {
+          "feature_id": 29851,
+          "contribution": 0.17407904560857596
+        },
+        {
+          "feature_id": 28504,
+          "contribution": 0.11376962966914367
+        }
+      ],
+      "top_actual_features": [
+        {
+          "feature_id": 22220,
+          "contribution": -0.0931266751618817
+        },
+        {
+          "feature_id": 7592,
+          "contribution": -0.08947383586240727
+        },
+        {
+          "feature_id": 25913,
+          "contribution": -0.08373941132374668
+        },
+        {
+          "feature_id": 19801,
+          "contribution": -0.04359791535461814
+        },
+        {
+          "feature_id": 32755,
+          "contribution": -0.02162961364045351
+        },
+        {
+          "feature_id": 7598,
+          "contribution": -0.0017877938386186756
+        }
+      ]
+    },
+    {
+      "test_doc_id": 19,
+      "actual": "rec.sport.baseball",
+      "predicted": "sci.space",
+      "intercept_difference": 0.07708420151956116,
+      "decision_margin": 0.023301171708317345,
+      "top_predicted_features": [
+        {
+          "feature_id": 27226,
+          "contribution": 0.12207216014942264
+        },
+        {
+          "feature_id": 8908,
+          "contribution": 0.0699533220253596
+        },
+        {
+          "feature_id": 2898,
+          "contribution": 0.06289004639692809
+        },
+        {
+          "feature_id": 27794,
+          "contribution": 0.025128335975794853
+        },
+        {
+          "feature_id": 10929,
+          "contribution": 0.024825059880589435
+        },
+        {
+          "feature_id": 20732,
+          "contribution": 0.023678987409808235
+        }
+      ],
+      "top_actual_features": [
+        {
+          "feature_id": 19898,
+          "contribution": -0.11871708797372194
+        },
+        {
+          "feature_id": 4990,
+          "contribution": -0.06540687986825115
+        },
+        {
+          "feature_id": 26619,
+          "contribution": -0.06377863073738686
+        },
+        {
+          "feature_id": 3572,
+          "contribution": -0.056357496846043124
+        },
+        {
+          "feature_id": 22250,
+          "contribution": -0.044731921230019366
+        },
+        {
+          "feature_id": 3965,
+          "contribution": -0.03519611524864082
+        }
+      ]
+    },
+    {
+      "test_doc_id": 25,
+      "actual": "talk.politics.mideast",
+      "predicted": "sci.space",
+      "intercept_difference": 0.24608200243726525,
+      "decision_margin": 0.11359724188916664,
+      "top_predicted_features": [],
+      "top_actual_features": [
+        {
+          "feature_id": 28737,
+          "contribution": -0.1324847605480986
+        }
+      ]
+    }
+  ],
+  "iterations": [
+    27
+  ],
+  "public_export": {
+    "included": [
+      "metrics",
+      "class_labels",
+      "document_ids",
+      "feature_ids",
+      "numeric_contributions"
+    ],
+    "excluded": [
+      "document_text",
+      "document_snippets",
+      "vocabulary_terms"
+    ],
+    "full_corpus_review": "pending",
+    "review_issue": "https://github.com/ntt65/A4_1/issues/8"
+  }
+}

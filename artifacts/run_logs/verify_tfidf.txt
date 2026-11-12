@@ -1,0 +1,7 @@
+$ python verify_tfidf.py
+exit_code=0
+=== NumPy TF-IDF vs Scikit-learn ===
+train: shape=[3029, 33297] max_error=2.3315e-15 mean_error=3.0568e-20
+test: shape=[758, 33297] max_error=8.3267e-16 mean_error=2.2134e-20
+queries: shape=[5, 33297] max_error=0.0000e+00 mean_error=0.0000e+00
+Vocabulary/TF/DF/IDF and Train/Test/query checks PASS; IDF error=0.0000e+00

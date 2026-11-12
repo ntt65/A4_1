@@ -1,0 +1,689 @@
+{
+  "schema_version": 2,
+  "train_documents": 3029,
+  "test_documents": 758,
+  "target_names": [
+    "comp.graphics",
+    "rec.sport.baseball",
+    "sci.space",
+    "talk.politics.mideast"
+  ],
+  "random_state": 42,
+  "tf_variants": {
+    "raw": {
+      "accuracy": 0.924802110817942,
+      "macro_f1": 0.9253286504902738,
+      "search_results": {
+        "space satellite launch orbit": [
+          {
+            "doc_id": 1934,
+            "score": 0.47370741021707474
+          },
+          {
+            "doc_id": 2609,
+            "score": 0.3076320303261277
+          },
+          {
+            "doc_id": 755,
+            "score": 0.29544990483801586
+          },
+          {
+            "doc_id": 2145,
+            "score": 0.2931700151501075
+          },
+          {
+            "doc_id": 1725,
+            "score": 0.2701464030651498
+          }
+        ],
+        "computer graphics rendering image": [
+          {
+            "doc_id": 2876,
+            "score": 0.42812298224413287
+          },
+          {
+            "doc_id": 2389,
+            "score": 0.4191096542457903
+          },
+          {
+            "doc_id": 1315,
+            "score": 0.3427611922343973
+          },
+          {
+            "doc_id": 2515,
+            "score": 0.2947840949937573
+          },
+          {
+            "doc_id": 884,
+            "score": 0.25478343961195593
+          }
+        ],
+        "baseball pitcher season game": [
+          {
+            "doc_id": 7,
+            "score": 0.3339909028888956
+          },
+          {
+            "doc_id": 2549,
+            "score": 0.29744596627933306
+          },
+          {
+            "doc_id": 701,
+            "score": 0.2791603415618993
+          },
+          {
+            "doc_id": 2398,
+            "score": 0.2516564565015881
+          },
+          {
+            "doc_id": 621,
+            "score": 0.24394290736280994
+          }
+        ],
+        "middle east peace politics": [
+          {
+            "doc_id": 565,
+            "score": 0.27750113267233223
+          },
+          {
+            "doc_id": 2670,
+            "score": 0.15504449436379866
+          },
+          {
+            "doc_id": 1208,
+            "score": 0.14812502530531524
+          },
+          {
+            "doc_id": 2698,
+            "score": 0.14213745477514095
+          },
+          {
+            "doc_id": 171,
+            "score": 0.13509104416073073
+          }
+        ]
+      },
+      "top5_overlap_with_raw": {
+        "space satellite launch orbit": 1.0,
+        "computer graphics rendering image": 1.0,
+        "baseball pitcher season game": 1.0,
+        "middle east peace politics": 1.0
+      }
+    },
+    "log": {
+      "accuracy": 0.924802110817942,
+      "macro_f1": 0.9251385177183878,
+      "search_results": {
+        "space satellite launch orbit": [
+          {
+            "doc_id": 1725,
+            "score": 0.2566262312643993
+          },
+          {
+            "doc_id": 2145,
+            "score": 0.2254703060110837
+          },
+          {
+            "doc_id": 1096,
+            "score": 0.19796253456051804
+          },
+          {
+            "doc_id": 1700,
+            "score": 0.19766710232284768
+          },
+          {
+            "doc_id": 755,
+            "score": 0.1941093854286168
+          }
+        ],
+        "computer graphics rendering image": [
+          {
+            "doc_id": 2389,
+            "score": 0.33345679805136363
+          },
+          {
+            "doc_id": 2876,
+            "score": 0.26391177060982346
+          },
+          {
+            "doc_id": 1315,
+            "score": 0.2526132418530919
+          },
+          {
+            "doc_id": 2166,
+            "score": 0.21695091168245878
+          },
+          {
+            "doc_id": 1722,
+            "score": 0.19474623779564365
+          }
+        ],
+        "baseball pitcher season game": [
+          {
+            "doc_id": 7,
+            "score": 0.3339909028888957
+          },
+          {
+            "doc_id": 2549,
+            "score": 0.2974459662793331
+          },
+          {
+            "doc_id": 621,
+            "score": 0.22467844479768007
+          },
+          {
+            "doc_id": 2749,
+            "score": 0.2155823723161052
+          },
+          {
+            "doc_id": 1103,
+            "score": 0.21540984129064517
+          }
+        ],
+        "middle east peace politics": [
+          {
+            "doc_id": 565,
+            "score": 0.2793525222608119
+          },
+          {
+            "doc_id": 1208,
+            "score": 0.15706135827352946
+          },
+          {
+            "doc_id": 2670,
+            "score": 0.15504449436379864
+          },
+          {
+            "doc_id": 2698,
+            "score": 0.13876122716613137
+          },
+          {
+            "doc_id": 1010,
+            "score": 0.13459727012577588
+          }
+        ]
+      },
+      "top5_overlap_with_raw": {
+        "space satellite launch orbit": 0.6,
+        "computer graphics rendering image": 0.6,
+        "baseball pitcher season game": 0.6,
+        "middle east peace politics": 0.8
+      }
+    },
+    "double": {
+      "accuracy": 0.9195250659630607,
+      "macro_f1": 0.9199622508103437,
+      "search_results": {
+        "space satellite launch orbit": [
+          {
+            "doc_id": 1725,
+            "score": 0.2395633703282406
+          },
+          {
+            "doc_id": 2145,
+            "score": 0.192422955669584
+          },
+          {
+            "doc_id": 1700,
+            "score": 0.18414778574268229
+          },
+          {
+            "doc_id": 2111,
+            "score": 0.17798895928440883
+          },
+          {
+            "doc_id": 1096,
+            "score": 0.17543351110321964
+          }
+        ],
+        "computer graphics rendering image": [
+          {
+            "doc_id": 2389,
+            "score": 0.29040070324029293
+          },
+          {
+            "doc_id": 2166,
+            "score": 0.2036061922223554
+          },
+          {
+            "doc_id": 1315,
+            "score": 0.19801783591128796
+          },
+          {
+            "doc_id": 514,
+            "score": 0.18643799258309277
+          },
+          {
+            "doc_id": 2876,
+            "score": 0.18062712279633358
+          }
+        ],
+        "baseball pitcher season game": [
+          {
+            "doc_id": 7,
+            "score": 0.3339909028888956
+          },
+          {
+            "doc_id": 2549,
+            "score": 0.29744596627933306
+          },
+          {
+            "doc_id": 1103,
+            "score": 0.23076369215809328
+          },
+          {
+            "doc_id": 2749,
+            "score": 0.22715063158970877
+          },
+          {
+            "doc_id": 621,
+            "score": 0.21133658868014682
+          }
+        ],
+        "middle east peace politics": [
+          {
+            "doc_id": 565,
+            "score": 0.28028001178335804
+          },
+          {
+            "doc_id": 1208,
+            "score": 0.1621125256111708
+          },
+          {
+            "doc_id": 2670,
+            "score": 0.15504449436379866
+          },
+          {
+            "doc_id": 2947,
+            "score": 0.14332080641459857
+          },
+          {
+            "doc_id": 1491,
+            "score": 0.139121613182045
+          }
+        ]
+      },
+      "top5_overlap_with_raw": {
+        "space satellite launch orbit": 0.4,
+        "computer graphics rendering image": 0.6,
+        "baseball pitcher season game": 0.6,
+        "middle east peace politics": 0.6
+      }
+    }
+  },
+  "bm25_toy": {
+    "corpus": [
+      [
+        "cat",
+        "sat",
+        "sat"
+      ],
+      [
+        "cat",
+        "dog"
+      ],
+      [
+        "dog"
+      ]
+    ],
+    "query": [
+      "cat",
+      "sat"
+    ],
+    "k1": 1.5,
+    "b": 0.75,
+    "expected_scores": [
+      1.5908508972825368,
+      0.47000362924573563,
+      0.0
+    ],
+    "actual_scores": [
+      1.5908508972825366,
+      0.4700036292457356,
+      0.0
+    ],
+    "max_absolute_error": 2.220446049250313e-16,
+    "tolerance": 1e-06,
+    "passed": true
+  },
+  "bm25_search_comparison": [
+    {
+      "query": "space satellite launch orbit",
+      "tfidf": [
+        {
+          "doc_id": 1934,
+          "score": 0.47370741021707474
+        },
+        {
+          "doc_id": 2609,
+          "score": 0.3076320303261277
+        },
+        {
+          "doc_id": 755,
+          "score": 0.29544990483801586
+        },
+        {
+          "doc_id": 2145,
+          "score": 0.2931700151501075
+        },
+        {
+          "doc_id": 1725,
+          "score": 0.2701464030651498
+        }
+      ],
+      "bm25": [
+        {
+          "doc_id": 755,
+          "score": 18.489050339217563
+        },
+        {
+          "doc_id": 1934,
+          "score": 17.408887079064442
+        },
+        {
+          "doc_id": 1725,
+          "score": 16.634021319526664
+        },
+        {
+          "doc_id": 186,
+          "score": 16.108640131217484
+        },
+        {
+          "doc_id": 3027,
+          "score": 15.985222328067021
+        }
+      ]
+    },
+    {
+      "query": "computer graphics rendering image",
+      "tfidf": [
+        {
+          "doc_id": 2876,
+          "score": 0.42812298224413287
+        },
+        {
+          "doc_id": 2389,
+          "score": 0.4191096542457903
+        },
+        {
+          "doc_id": 1315,
+          "score": 0.3427611922343973
+        },
+        {
+          "doc_id": 2515,
+          "score": 0.2947840949937573
+        },
+        {
+          "doc_id": 884,
+          "score": 0.25478343961195593
+        }
+      ],
+      "bm25": [
+        {
+          "doc_id": 2389,
+          "score": 22.753993534495365
+        },
+        {
+          "doc_id": 2697,
+          "score": 15.895710643954596
+        },
+        {
+          "doc_id": 1722,
+          "score": 15.313454658729693
+        },
+        {
+          "doc_id": 2065,
+          "score": 14.998768423068292
+        },
+        {
+          "doc_id": 1107,
+          "score": 14.3585031072387
+        }
+      ]
+    },
+    {
+      "query": "baseball pitcher season game",
+      "tfidf": [
+        {
+          "doc_id": 7,
+          "score": 0.3339909028888956
+        },
+        {
+          "doc_id": 2549,
+          "score": 0.29744596627933306
+        },
+        {
+          "doc_id": 701,
+          "score": 0.2791603415618993
+        },
+        {
+          "doc_id": 2398,
+          "score": 0.2516564565015881
+        },
+        {
+          "doc_id": 621,
+          "score": 0.24394290736280994
+        }
+      ],
+      "bm25": [
+        {
+          "doc_id": 955,
+          "score": 14.912897063878013
+        },
+        {
+          "doc_id": 1663,
+          "score": 13.663166330215219
+        },
+        {
+          "doc_id": 784,
+          "score": 13.386985644615386
+        },
+        {
+          "doc_id": 852,
+          "score": 12.804931622393676
+        },
+        {
+          "doc_id": 701,
+          "score": 12.675732123232429
+        }
+      ]
+    },
+    {
+      "query": "middle east peace politics",
+      "tfidf": [
+        {
+          "doc_id": 565,
+          "score": 0.27750113267233223
+        },
+        {
+          "doc_id": 2670,
+          "score": 0.15504449436379866
+        },
+        {
+          "doc_id": 1208,
+          "score": 0.14812502530531524
+        },
+        {
+          "doc_id": 2698,
+          "score": 0.14213745477514095
+        },
+        {
+          "doc_id": 171,
+          "score": 0.13509104416073073
+        }
+      ],
+      "bm25": [
+        {
+          "doc_id": 565,
+          "score": 16.961928245882547
+        },
+        {
+          "doc_id": 2698,
+          "score": 12.884138491178916
+        },
+        {
+          "doc_id": 2010,
+          "score": 12.073305896520395
+        },
+        {
+          "doc_id": 2327,
+          "score": 11.50342184671841
+        },
+        {
+          "doc_id": 482,
+          "score": 11.37136711852828
+        }
+      ]
+    }
+  ],
+  "inverted_index": {
+    "build_seconds": 0.46332110000003013,
+    "query_timing_scope": "score computation and Top-5 selection, excluding tokenization/vectorization",
+    "timing_repeats": 3,
+    "blas_threads": 2,
+    "max_absolute_error": 0.0,
+    "top5_rank_match_fraction": 1.0,
+    "queries": [
+      {
+        "query": "space satellite launch orbit",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [
+          1934,
+          2609,
+          755,
+          2145,
+          1725
+        ],
+        "inverted_top5": [
+          1934,
+          2609,
+          755,
+          2145,
+          1725
+        ],
+        "dense_query_ms": 24.074599999948987,
+        "inverted_query_ms": 0.3283000005467329
+      },
+      {
+        "query": "computer graphics rendering image",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [
+          2876,
+          2389,
+          1315,
+          2515,
+          884
+        ],
+        "inverted_top5": [
+          2876,
+          2389,
+          1315,
+          2515,
+          884
+        ],
+        "dense_query_ms": 23.827399999390764,
+        "inverted_query_ms": 0.26280000020051375
+      },
+      {
+        "query": "baseball pitcher season game",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [
+          7,
+          2549,
+          701,
+          2398,
+          621
+        ],
+        "inverted_top5": [
+          7,
+          2549,
+          701,
+          2398,
+          621
+        ],
+        "dense_query_ms": 23.299800000131654,
+        "inverted_query_ms": 0.27709999994840473
+      },
+      {
+        "query": "middle east peace politics",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [
+          565,
+          2670,
+          1208,
+          2698,
+          171
+        ],
+        "inverted_top5": [
+          565,
+          2670,
+          1208,
+          2698,
+          171
+        ],
+        "dense_query_ms": 22.322300000269024,
+        "inverted_query_ms": 0.23810000038793078
+      },
+      {
+        "query": "",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [],
+        "inverted_top5": [],
+        "dense_query_ms": 22.36559999983001,
+        "inverted_query_ms": 0.04939999962516595
+      },
+      {
+        "query": "zzzzunseenquerytoken",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [],
+        "inverted_top5": [],
+        "dense_query_ms": 22.7588999996442,
+        "inverted_query_ms": 0.04269999953976367
+      },
+      {
+        "query": "space space satellite",
+        "max_absolute_error": 0.0,
+        "top5_rank_equal": true,
+        "dense_top5": [
+          2580,
+          2087,
+          2993,
+          1934,
+          123
+        ],
+        "inverted_top5": [
+          2580,
+          2087,
+          2993,
+          1934,
+          123
+        ],
+        "dense_query_ms": 22.739000000001397,
+        "inverted_query_ms": 0.2193000000261236
+      }
+    ]
+  },
+  "public_export": {
+    "included": [
+      "metrics",
+      "class_labels",
+      "public_queries",
+      "document_ids",
+      "scores",
+      "synthetic_toy_example"
+    ],
+    "excluded": [
+      "document_text",
+      "document_snippets",
+      "vocabulary_terms"
+    ],
+    "full_corpus_review": "pending",
+    "review_issue": "https://github.com/ntt65/A4_1/issues/8"
+  }
+}

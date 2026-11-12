@@ -1,0 +1,10 @@
+$ python main.py --train-classifier
+exit_code=0
+Train=3029 Test=758 Vocabulary=33297
+Classification Accuracy: 92.4802% | Macro-F1: 0.925329
+Confusion matrix (actual rows, predicted columns):
+[[179   4   8   0]
+ [  4 177  10   1]
+ [  5   5 178   3]
+ [  1   8   8 167]]
+Saved artifacts/confusion_matrix.png and classifier_metrics.json

@@ -1,0 +1,9 @@
+# Published numeric output; document excerpts omitted.
+$ python main.py --query space satellite launch orbit --topk 5
+exit_code=0
+=== Search Results for 'space satellite launch orbit' (Top 5) ===
+[1] Score: 0.4737 | Doc #1934
+[2] Score: 0.3076 | Doc #2609
+[3] Score: 0.2954 | Doc #755
+[4] Score: 0.2932 | Doc #2145
+[5] Score: 0.2701 | Doc #1725

@@ -1,182 +1,233 @@
 # A4_1 문서 검색 및 분류 시스템
 
-20 Newsgroups 문서를 대상으로 NumPy TF-IDF와 코사인 검색을 구현하고, Logistic Regression으로 분류 성능을 평가하는 프로젝트입니다. 아래 알고리즘 설명은 현재 구현 계획에 근거합니다.
-
-2026-11-12 로컬 점검에서 `main.py`, `verify_tfidf.py`, Python 알고리즘 모듈, 데이터, 혼동 행렬 파일의 부재를 확인했습니다. 현재 `src/`에는 React 화면 코드가 있습니다. Python 가상환경과 의존성은 준비됐으며, 알고리즘 실행과 성능 재검증은 코드 이관 후 진행해야 합니다.
+NumPy로 TF-IDF와 코사인 검색을 구현하고, 20 Newsgroups 네 카테고리의 문서를 Logistic Regression으로 분류합니다. 사용자 제공 Python 소스를 로컬에 복원한 후 2026-11-12에 검증했습니다.
 
 ## 1. 구현 요약
 
-### 데이터와 전처리 설계
+코드·문서·커밋·이슈·PR은 로컬 작업 브랜치와 GitHub에서 관리합니다. AI Studio의 A4_1 프로젝트 GitHub 연결은 2026-11-12 해제했습니다. 기본 브랜치와 작업 브랜치, 과거 커밋의 목적 및 현재 검토 경로는 관리 문서에 기록했습니다. [Git 작업 절차](docs/GIT_WORKFLOW.md), [공개 이력 추적표](docs/git_history_map.md), [정리 실행 계획](docs/git_workflow_repair_plan.md)
 
-대상 카테고리는 `comp.graphics`, `rec.sport.baseball`, `sci.space`, `talk.politics.mideast`입니다. 계획은 `fetch_20newsgroups`로 데이터를 읽고 `remove=('headers', 'footers', 'quotes')`를 적용한 뒤 Train/Test를 8:2, `random_state=42`로 고정하는 방식입니다. 기존 문서는 총 3,792건, Train 3,033건, Test 759건을 보고합니다. 로컬 데이터와 분할 결과는 확인 대기 상태입니다.
+Git 관리·이슈 동기화 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. 기존 이슈 정의는 `docs/github_issues.json`에 있으며 `python create_github_issues.py`는 기본적으로 오프라인 미리보기를 출력합니다.
 
-소문자화 후 정규식 `r'(?u)\b\w\w+\b'`로 토큰을 추출합니다. 이 패턴은 Unicode 단어 문자 두 개 이상을 허용하며 숫자와 밑줄도 포함합니다. 구두점은 토큰 경계가 되고 한 글자 토큰은 제외됩니다. `C++`, `3D`, 하이픈 단어 등의 보존 여부는 검색 목적에 따라 검토해야 합니다. 동의어 치환은 계획에서 제외했습니다. 의미가 다른 표현을 한 단어로 합치는 오류를 피하고 참조 구현과 같은 입력을 사용하기 위한 선택입니다.
+현재 구현·검증·Git 관리 변경은 `main` 대상 통합 PR #12에서 검토합니다. PR #9·#10은 전체 변경 포함을 확인한 뒤 #12로 대체 종료했습니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12)
 
-불용어는 `resources/stopwords_en.txt`에 고정하고 출처와 버전을 기록하는 설계입니다. 해당 파일은 현재 이관 대기 상태입니다. 특히 부정어를 제거하면 문장의 극성이 사라질 수 있어 목록 검토가 필요합니다. 어휘와 IDF는 Train에만 `fit`하고 Test와 쿼리에는 동일한 변환을 적용합니다.
+### 데이터와 전처리
 
-미션은 최소 500개 문서, 두 개 이상 카테고리, 결측치 처리, 개인정보 미포함 확인, 라이선스 확인을 요구합니다. 헤더 제거만으로 본문의 식별 가능한 이름과 연락처가 모두 제거됐다고 판단할 수 없습니다. 실제 데이터 검수와 이용 조건 확인 기록이 필요합니다.
+`comp.graphics`, `rec.sport.baseball`, `sci.space`, `talk.politics.mideast`의 원본 3,894건을 사용했습니다. `headers`, `footers`, `quotes`를 제거하고 이메일과 일반적인 전화번호 형식을 마스킹했습니다. 공백만 남은 107건을 제외해 3,787건을 확보했습니다. `train_test_split(test_size=0.2, random_state=42, stratify=labels)`로 Train 3,029건, Test 758건을 고정했습니다. 이번 분할에서 Train/Test 사이 완전히 동일한 본문은 0건입니다.
 
-### NumPy TF-IDF 수식
+| 카테고리 | Train | Test |
+| --- | --- | --- |
+| comp.graphics | 764 | 191 |
+| rec.sport.baseball | 766 | 192 |
+| sci.space | 764 | 191 |
+| talk.politics.mideast | 735 | 184 |
 
-문서 수를 $N$, 학습 어휘 크기를 $|V|$, 문서 $d$의 단어 $t$ 출현 횟수를 $c_{d,t}$라 두면 다음과 같습니다.
+소문자화 후 `r'(?u)\b\w\w+\b'`로 두 글자 이상의 Unicode 단어 토큰을 추출합니다. 숫자와 밑줄도 단어 문자에 포함됩니다. 한 글자 `C`와 `C++` 같은 용어의 손실은 현재 규칙의 한계입니다. 동의어 치환은 적용하지 않습니다.
 
-$$\mathrm{tf}(d,t)=c_{d,t},\quad \mathrm{df}(t)=\sum_{d=1}^{N}\mathbf{1}[c_{d,t}>0]$$
+고정 불용어 123개는 [stopwords_en.txt](resources/stopwords_en.txt)에 있습니다. 사용자 제공 소스의 목록을 프로젝트 기준 `a4-1-en-v1`로 채택하고 기능어 제거의 선정 근거와 UTF-8·LF 정규화 해시를 기록했습니다. 외부 목록의 원출처·버전은 제공되지 않았습니다. `no`, `nor`, `not`도 포함돼 부정 표현이 손실될 수 있습니다. 파일 경로는 모듈 위치를 기준으로 합니다. [목록 선정 근거와 해시](docs/A4_1_data_sources.md)
 
-$$\mathrm{idf}(t)=\ln\left(\frac{1+N}{1+\mathrm{df}(t)}\right)+1,\quad x_{d,t}=\mathrm{tf}(d,t)\mathrm{idf}(t)$$
+어휘 33,297개와 IDF는 Train에서만 학습합니다. Test와 질의에는 학습된 어휘·IDF를 그대로 사용하고 OOV는 제외합니다. 데이터 분포와 코퍼스 SHA-256은 [데이터 메타데이터](artifacts/dataset_metadata.json)에 기록했습니다.
 
-$$\hat{x}_d=\frac{x_d}{\|x_d\|_2}\quad(\|x_d\|_2>0)$$
+### TF-IDF와 코사인 검색
 
-영벡터는 그대로 유지합니다. 행렬 shape는 `(문서 수, 학습 어휘 크기)`이며, 어휘 열을 알파벳 순으로 정렬하고 `float64`로 계산합니다. 사전 미등록 단어는 변환 시 제외하는 설계입니다.
+문서 수를 $N$, 단어 출현 횟수를 $c_{d,t}$라 두면 다음과 같습니다.
 
-참조 검증 설정은 아래와 같습니다. `preprocess_pipeline`은 구현 계획상의 함수이며 코드 이관 후 실제 이름과 동작을 대조해야 합니다.
+$$tf(d,t)=c_{d,t},\quad df(t)=\sum_d\mathbf{1}[c_{d,t}>0]$$
+$$idf(t)=\ln\left(\frac{1+N}{1+df(t)}\right)+1,\quad x_{d,t}=tf(d,t)idf(t)$$
+$$\hat{x}_d=x_d/\|x_d\|_2\quad(\|x_d\|_2>0)$$
 
-```python
-TfidfVectorizer(
-    analyzer=preprocess_pipeline,
-    stop_words=None,
-    dtype=np.float64,
-    smooth_idf=True,
-    sublinear_tf=False,
-    norm="l2",
-)
-```
+영벡터는 0으로 유지합니다. 어휘 열을 알파벳 순으로 정렬하고 `float64`로 계산합니다. 핵심 계산은 [tfidf.py](src/tfidf.py)에 있습니다. sklearn은 데이터 로딩·검증·분류에 사용하며, 직접 구현한 TF-IDF와 코사인 점수 계산은 NumPy를 사용합니다.
 
-callable analyzer가 소문자화, 토큰화와 불용어 제거를 모두 수행해야 합니다. 양쪽 구현에서 토큰열, 어휘와 열 순서, TF, DF, IDF, 최종 벡터를 단계별로 비교해야 합니다.
+$$\cos(d,q)=\frac{d\cdot q}{\|d\|_2\|q\|_2}=\hat{d}\cdot\hat{q}$$
 
-### 검색과 분류 구조
+[search_engine.py](src/search_engine.py)는 정규화된 문서 행렬과 질의 벡터를 곱합니다. 점수가 양수인 문서만 반환하고 점수 내림차순, 동점 시 문서 ID 오름차순을 적용합니다. `np.partition`으로 Top-K 경계를 선택한 뒤 경계 동점을 포함해 정렬합니다. Dense 점수 계산은 $O(N|V|)$이고, 경계 동점이 많으면 후보 정렬 비용이 커집니다. 빈 입력과 OOV 질의는 빈 리스트를 반환합니다.
 
-전처리 → Train 전용 어휘·IDF 학습 → 문서 및 쿼리 벡터화 → 검색 또는 분류 순서입니다. 전처리 규칙을 공유하면 참조 검증과 실서비스 입력의 차이를 줄일 수 있습니다. 벡터화와 검색을 분리하면 TF 변형과 검색 전략을 독립적으로 비교할 수 있습니다.
+### 모듈과 실행 환경
 
-코사인 유사도는 $\mathrm{cos}(d,q)=\frac{d\cdot q}{\|d\|_2\|q\|_2}$입니다. 두 벡터가 L2 정규화돼 있으면 NumPy 행렬곱 `D @ q`로 계산할 수 있습니다. 점수 내림차순, 동점 시 문서 ID 오름차순, 0점 문서 제외가 계획상의 정책입니다. OOV만 있는 쿼리나 빈 입력은 빈 검색 결과로 처리합니다.
+| 모듈 | 역할 |
+| --- | --- |
+| src/dataset.py | 다운로드·캐시·마스킹·고정 분할 |
+| src/preprocess.py | 불용어 로딩·소문자화·토큰화 |
+| src/tfidf.py | Train 어휘·DF·IDF와 NumPy 변환 |
+| src/search_engine.py | 코사인 점수·Top-K·인덱스 저장·로드 |
+| src/classifier.py | Logistic Regression·지표·혼동 행렬·오분류 근거 |
+| verify_tfidf.py | 어휘·TF·DF·IDF·Train/Test/질의 대조 |
+| main.py | CLI와 `search()` 진입점 |
 
-분류는 동일한 Train TF-IDF로 `LogisticRegression(random_state=42)`를 학습하고 Test에서 Accuracy, Macro-F1 및 혼동 행렬을 산출하는 설계입니다. 실제 학습 옵션과 수렴 상태는 원본 코드 확인이 필요합니다.
+전처리와 벡터화를 분리해 검색·분류에서 같은 표현을 재사용합니다. 검색 전략과 분류 모델을 교체할 때 전처리 규칙을 유지하고 단계별 오류를 확인할 수 있습니다. 분류에는 `LogisticRegression(max_iter=1000, random_state=42)`를 사용합니다. NumPy 결과를 CSR로 변환해 분류기에 전달하고 BLAS 스레드는 2개로 제한했습니다. 이번 학습은 27회 반복으로 종료됐습니다.
 
-### 실행 방법
+검증 환경은 Windows, Python 3.14.7, uv 0.13.7, NumPy 2.5.4, scikit-learn 1.9.1입니다. 의존성은 [requirements.txt](requirements.txt)에 고정했습니다. 첨부 소스의 NumPy `<2`, sklearn `<1.4` 범위는 현재 Python과 맞지 않아 설치된 조합을 사용했습니다. 미션은 Python 3.10 이상을 요구하며 현재 패키지 조합은 Python 3.14.7에서 검증했습니다.
 
-현재 검증된 환경은 Windows, Python 3.14.7, uv 0.13.7입니다. 미션의 Python 3.10 이상 조건과 별도로, 현재 고정 패키지 조합은 Python 3.14.7에서 확인했습니다.
-
-CMD에서 실행합니다.
+CMD에서 환경을 준비합니다. 기존 `.venv`가 있으면 활성화부터 진행합니다.
 
 ```bat
 cd /d D:\git\A4_1
+uv venv
 .venv\Scripts\activate
 uv pip install -r requirements.txt
 ```
 
-PowerShell에서 실행합니다.
+PowerShell의 활성화 명령은 다음과 같습니다.
 
 ```powershell
-Set-Location D:\git\A4_1
 .\.venv\Scripts\Activate.ps1
-uv pip install -r requirements.txt
 ```
 
-최초 환경 생성은 `uv venv`를 사용합니다. 현재 `.venv`는 생성 및 패키지 설치가 완료됐습니다. 활성화는 해당 터미널의 Python 경로를 선택합니다. 자동화에서는 `uv pip install --python .venv\Scripts\python.exe -r requirements.txt`처럼 대상을 지정할 수도 있습니다.
-
-CLI 안 A는 아래 명령으로 검증하도록 요청됐습니다. 현재는 Python 소스 이관이 선행돼야 합니다.
+CLI 안 A는 다음과 같습니다. 최초 데이터 다운로드에는 네트워크가 필요하며 이후에는 `artifacts/data_cache`를 사용합니다.
 
 ```bash
 python verify_tfidf.py
-python main.py --build-index
 python main.py --query "space satellite launch orbit" --topk 5
 python main.py --train-classifier
 python main.py --bonus
+python -m unittest discover -s tests -v
 ```
 
-함수 안 B는 다음 반환 규격을 계획합니다. 아래 예시는 구현 계획상의 API이며 이관 후 실제 엔트리포인트와 대조해야 합니다.
+인덱스를 저장하면 다음 검색부터 학습 없이 로드합니다. 데이터를 변경하면 인덱스를 다시 생성해야 합니다.
+
+```bash
+python main.py --build-index
+python main.py --query "computer graphics rendering image" --topk 5
+```
+
+함수 안 B도 지원합니다.
 
 ```python
-from src.search_engine import SearchEngine
+from main import search
 
-engine = SearchEngine.load()
-results = engine.search(query="space satellite launch orbit", top_k=5)
-for score, doc_id, text_snippet in results:
+# search(query: str, top_k: int = 5) -> List[Tuple[float, int, str]]
+for score, doc_id, text_snippet in search("space satellite launch orbit", top_k=5):
     print(f"{score:.4f} {doc_id} {text_snippet}")
-# 반환 규격 List[Tuple[float, int, str]]
 ```
 
 ## 2. 검증 및 실험 결과
 
-### 로컬 실행 결과
+### TF-IDF 수치 검증
 
-NumPy 2.5.4, scikit-learn 1.9.1, matplotlib 3.11.2, seaborn 0.13.2 로딩을 확인했으며 `uv pip check`에서 설치된 19개 패키지의 의존성 호환성 검사를 통과했습니다. 알고리즘 테스트 파일은 현재 없습니다.
+sklearn 참조 설정은 공통 `TextPreprocessor.tokenize` analyzer, `smooth_idf=True`, `sublinear_tf=False`, `norm='l2'`, `dtype=np.float64`입니다. callable analyzer가 소문자화·토큰화·불용어 제거를 모두 수행합니다. 어휘와 열 순서, TF 및 DF를 동일성 비교하고 IDF와 최종 벡터를 대조했습니다.
 
-요청된 네 명령은 모두 실제 실행했으며 종료 코드는 각각 2입니다. 다음은 실행 출력의 일부입니다.
+| 입력 | Shape | 최대 절대 오차 | 평균 절대 오차 |
+| --- | --- | --- | --- |
+| Train | 3,029 × 33,297 | 2.3315e-15 | 3.0568e-20 |
+| Test | 758 × 33,297 | 8.3267e-16 | 2.2134e-20 |
+| 질의 5개 | 5 × 33,297 | 0 | 0 |
+
+IDF 오차는 0입니다. 미션의 `1e-6` 허용 기준을 통과했습니다. 질의에는 빈 문자열, 불용어만 있는 문자열, OOV를 포함했습니다. 실패 시 검증 스크립트가 예외로 종료되도록 수정했습니다. [검증 결과 JSON](artifacts/tfidf_verification.json), [실행 출력](artifacts/run_logs/verify_tfidf.txt)
 
 ```text
-$ python verify_tfidf.py
-exit_code=2
-can't open file 'D:\\git\\A4_1\\verify_tfidf.py': [Errno 2] No such file or directory
-
-$ python main.py --query space satellite launch orbit --topk 5
-exit_code=2
-can't open file 'D:\\git\\A4_1\\main.py': [Errno 2] No such file or directory
+train: shape=[3029, 33297] max_error=2.3315e-15 mean_error=3.0568e-20
+test: shape=[758, 33297] max_error=8.3267e-16 mean_error=2.2134e-20
+queries: shape=[5, 33297] max_error=0.0000e+00 mean_error=0.0000e+00
+Vocabulary/TF/DF/IDF and Train/Test/query checks PASS; IDF error=0.0000e+00
 ```
 
-전체 출력과 분류·보너스 실행 결과는 [로컬 실행 로그](artifacts/verification_local.log)에 있습니다. 로그는 `.gitignore`의 `*.log` 규칙으로 기본 제외되므로 제출에 포함할 때 추적 여부를 확인해야 합니다.
+### 검색 실행 결과
 
-### 기존 보고 수치의 재현 상태
+아래는 실제 출력에서 점수·문서 ID·스니펫의 일부를 발췌한 결과입니다. 문서 ID는 고정 Train 목록의 0 기반 인덱스입니다. [전체 검색 출력](artifacts/run_logs/search.txt)
 
-아래 수치는 [선행 체크리스트](docs/repo_readme/docs_03_verification_and_checklists.md)에 기록돼 있습니다. 이번 로컬 실행에서는 성능 수치를 산출하지 못했습니다.
+```text
+=== Search Results for 'space satellite launch orbit' (Top 5) ===
+[1] Score: 0.4737 | Doc #1934: COMMERCIAL SPACE NEWS/SPACE TECHNOLOGY INVESTOR NUMBER 22
+[2] Score: 0.3076 | Doc #2609: The Space Calendar is updated monthly
+[3] Score: 0.2954 | Doc #755: [Regarding orbital billboards...]
+[4] Score: 0.2932 | Doc #2145: Navstar GPS Constellation Status
+[5] Score: 0.2701 | Doc #1725: Putting a satellite as high as possible
+```
 
-| 항목 | 기존 문서 기록 | 로컬 검증 상태 |
-| --- | --- | --- |
-| Train / Test | 3,033 / 759 | 데이터 부재로 대조 대기 |
-| TF-IDF 최대 절대 오차 | 1.1102e-15 | 검증 스크립트 부재 |
-| Accuracy | 97.56% | 분류 코드 부재 |
-| Macro-F1 | 0.9758 | 분류 코드 부재 |
-| 혼동 행렬 | 생성 완료로 기록 | 이미지 부재 |
+### 분류 지표와 혼동 행렬
 
-미션의 허용 오차는 `1e-6` 이내입니다. 기존 기록 `1.1102e-15`는 이 기준보다 작습니다. 아키텍처 문서에 적힌 `1e-15 미만` 기준과 비교하면 이 기록은 해당 기준을 초과합니다. 발표에서는 미션 기준과 실제 측정값을 각각 명시해야 합니다.
+Test 758건 중 701건을 맞혀 Accuracy **92.4802%**, Macro-F1 **0.925329**를 얻었습니다. 오분류는 57건입니다. [전체 분류 지표와 사례](artifacts/classifier_metrics.json), [실행 출력](artifacts/run_logs/classifier.txt)
 
-혼동 행렬의 요청 대상은 `artifacts/confusion_matrix.png`입니다. 이미지가 생성되면 README에서 해당 경로를 연결하고 실제 클래스 순서, 축 레이블, 건수를 확인해야 합니다. 현재 파일 부재로 이미지 삽입을 보류했습니다.
+| 클래스 | Precision | Recall | F1 | Test 건수 |
+| --- | --- | --- | --- | --- |
+| comp.graphics | 0.9471 | 0.9372 | 0.9421 | 191 |
+| rec.sport.baseball | 0.9124 | 0.9219 | 0.9171 | 192 |
+| sci.space | 0.8725 | 0.9319 | 0.9013 | 191 |
+| talk.politics.mideast | 0.9766 | 0.9076 | 0.9408 | 184 |
 
-검색 품질은 관련도 정답과 평가 쿼리가 확보돼야 평가할 수 있습니다. 분류 Accuracy와 TF-IDF 수치 오차만으로 검색 관련도를 입증할 수 없으므로, 재검증 시 Top-5 출력과 문서별 관련성 판단도 기록해야 합니다.
+![행은 실제 레이블, 열은 예측 레이블인 혼동 행렬](artifacts/confusion_matrix.png)
 
-## 3. BoW 한계와 개선 방향
+```text
+Classification Accuracy: 92.4802% | Macro-F1: 0.925329
+[[179   4   8   0]
+ [  4 177  10   1]
+ [  5   5 178   3]
+ [  1   8   8 167]]
+```
 
-### 표현 방식의 한계
+요청된 네 CLI 명령은 모두 종료 코드 0으로 완료했습니다. [명령별 검증 기록](artifacts/verification_results.json)에 실행 시각과 로그 경로를 기록했습니다. `tests/`의 회귀 검사는 빈 입력·OOV·Train 전용 학습·동점 경계·인덱스 저장/로드·BM25 수식·역색인 재구축 등을 확인합니다.
 
-`dog bites man`과 `man bites dog`는 단어 빈도가 같아 unigram BoW 벡터가 같습니다. 문장 역할과 어순에 따른 의미 차이를 잃습니다. `bank`처럼 금융기관과 강둑을 함께 뜻하는 단어는 문맥을 구분하기 어렵습니다. 동의어는 서로 다른 열로 분리되므로 의미가 가까운 문서의 점수가 낮아질 수 있습니다. 짧거나 OOV가 많은 문서는 벡터가 빈약해지고, 제거된 부정어는 의미 반전을 숨길 수 있습니다.
+선행 문서의 정확도 97.56%, Macro-F1 0.9758 및 오차 1.1102e-15는 과거 제공 자료의 기록입니다. 이번 소스와 고정 데이터 처리에서 나온 결과는 위 표에 반영했습니다. 원본 코드에서 빈 문서 제거, 실행 오류 수정, 실제 보너스 검증 및 오분류 근거 수집을 보완했습니다.
 
-### 실제 오분류 5건 분석의 확보 상태
+## 3. BoW 한계와 오분류 원인
 
-미션은 Test에서 실제로 잘못 분류한 문서 5건 이상의 분석을 요구합니다. 현재 예측 결과와 문서 원문이 없어 개별 원인을 확정할 수 없습니다. 재실행 후 아래 항목을 각 사례에 기록해야 합니다.
+### 실제 Test 오분류 5건
 
-| 사례 | 필요한 실측 근거 | 검토할 BoW 원인 |
-| --- | --- | --- |
-| 1 | Test 문서 ID, 실제·예측 레이블, 비식별 본문, 기여 단어 | 어순·부정 표현 손실 |
-| 2 | Test 문서 ID, 실제·예측 레이블, 비식별 본문, 기여 단어 | 다의어의 문맥 혼동 |
-| 3 | Test 문서 ID, 실제·예측 레이블, 비식별 본문, 기여 단어 | 두 주제의 공유 어휘 |
-| 4 | Test 문서 ID, 실제·예측 레이블, 비식별 본문, 기여 단어 | 짧은 문서·OOV·희소성 |
-| 5 | Test 문서 ID, 실제·예측 레이블, 비식별 본문, 기여 단어 | 동의어 분리·전처리 정보 손실 |
+아래 ID는 Test 목록의 0 기반 인덱스입니다. 설명은 실제 본문과 선형 모델의 클래스 점수 차이를 근거로 한 원인 가설입니다. 기여도는 $x_t(w_{pred,t}-w_{true,t})$로 계산하며 양수이면 예측 클래스를 지지합니다. 전체 점수 차이는 기여도 합에 절편 차이를 더한 값입니다. 인명은 본문 발췌에서 생략했습니다.
 
-위 다섯 행은 분석 관점이며 실제 오분류 사례를 확보한 상태는 아닙니다. 문서당 실제·예측 클래스 간 선형 모델 기여도 차이와 원문 문맥을 함께 검토하면 원인 가설을 점검할 수 있습니다.
+| Test ID | 실제 → 예측 | 본문 근거 | 기여도 및 분석 |
+| --- | --- | --- | --- |
+| 3 | mideast → space | `palestinian police force`, `concrete proposals`, `idea` | `palestinian` -0.3580, `police` -0.1445가 실제 클래스를 지지했지만 `idea` +0.2409 등 일반 어휘와 절편 +0.2461이 합쳐져 space가 0.0123 앞섰습니다. 정치적 구문의 관계를 독립 단어 가중치만으로 충분히 표현하기 어렵다는 가설입니다. |
+| 5 | graphics → space | `What is 9 x 6?`, `base 13 system` | `system` +0.1815, `base` +0.0935가 space를 지지했습니다. 한 글자 `9`, `x`, `6`은 정규식에서 사라집니다. 게시글 대화 맥락과 그래픽 주제 단서가 부족한 짧은 문서의 오류입니다. |
+| 13 | graphics → baseball | `RS6000 compiler`, `COBOL`, `pascal` | `pascal` -0.0931, `compiler` -0.0895가 실제 클래스를 지지했지만 잔존 서명 토큰 +0.2122와 `think` +0.1741이 다른 클래스를 밀었습니다. 서명 제거의 불완전성과 이름·일반 단어의 우연한 상관관계가 드러납니다. |
+| 19 | baseball → space | `SI`, `article`, `subscription`, `date` | `si` +0.1221, `date` +0.0700이 space를 지지했고 최종 점수 차이는 0.0233입니다. 약어의 의미와 기사 대상의 문맥을 unigram만으로 복원하기 어려운 사례입니다. |
+| 25 | mideast → space | `What are you stupid?` | 불용어 제거 후 `stupid`만 남습니다. 이 단어의 기여도는 -0.1325지만 절편 차이 +0.2461이 커 최종 space 점수가 0.1136 앞섰습니다. 주제 정보가 거의 없는 짧은 문서에서 클래스 기본 경향에 의존합니다. |
 
-후속 비교는 bigram으로 어순 일부를 보존하고, 문맥 임베딩 또는 Transformer 모델로 다의어와 동의어를 다루는 방향입니다. 같은 데이터 분할과 관련도 정답을 유지해 Accuracy, Macro-F1, Precision@5, nDCG@5를 비교해야 합니다. 백만 문서 확장 시 dense 행렬의 메모리와 전체 스캔이 병목이 됩니다. 희소 저장, 역색인, Top-K 가지치기 및 캐시를 비교하고 인덱스 구축 시간과 질의 지연 p50/p95를 별도로 측정해야 합니다.
+### 표현 방식의 한계와 개선 실험
 
-근거 문서는 [미션 PDF](docs/A4_1_mission.pdf) 2~5쪽, [평가 PDF](docs/A4_1_eval.pdf) 10~11쪽, [구현 계획](IMPLEMENTATION_PLAN.md)입니다. [평가 대비 Q&A](docs/A4_1_mission_QnA.md)와 [발표 개요](docs/A4_1_presentation_outline.md)를 함께 제공합니다.
+`dog bites man`과 `man bites dog`는 같은 빈도로 표현돼 주어·목적어의 차이를 잃습니다. `bank`와 `사과` 같은 다의어는 하나의 차원에 합쳐지고 `car`와 `automobile` 같은 동의어는 다른 차원에 나뉩니다. 위 실제 사례에서는 짧은 문서, 약어, 잔존 서명과 전처리 손실을 확인했습니다. 각 사례의 개선 여부는 추가 실험으로 검증해야 합니다.
+
+후속 비교는 부정어 보존, 도메인 토큰 정규식, bigram, 문맥 임베딩 또는 Transformer 모델을 대상으로 합니다. 같은 분할에서 Accuracy·Macro-F1을 비교하고, 관련도 정답이 있는 평가 쿼리로 Precision@5와 nDCG@5를 측정해야 합니다. 현재 검색 결과의 주제 적합성과 순위 변화는 관찰했으며 검색 품질 정답셋은 구축 대기 상태입니다.
+
+백만 문서·어휘 5만 개의 dense float64 행렬은 원소만 약 400GB가 필요합니다. 희소 저장·역색인·후보 가지치기·캐시를 비교하고 인덱스 구축 비용과 질의 지연 p50/p95를 나눠 측정하는 방향입니다.
+
+### 데이터 이용과 검수 상태
+
+sklearn 문서는 헤더 등 메타데이터가 분류 성능에 영향을 줄 수 있음을 설명합니다. 현재 구현은 헤더·푸터·인용 제거와 이메일·일반 전화번호 마스킹을 수행합니다. 실제 결과에 서명과 인명이 남아 있어 미션의 개인정보 미포함 조건에 대한 추가 검수가 필요합니다. 원본 데이터는 자동 다운로드 캐시에 보관합니다. [sklearn 데이터셋 설명](https://scikit-learn.org/stable/datasets/real_world.html#the-20-newsgroups-text-dataset)
+
+실제 sklearn 다운로드 파일과 일치하는 Figshare file ID `5975967`, 항목 `3829962` 버전 2에서 CC BY 4.0 표기를 확인했습니다. 출처 표기는 Nelson Liu, 2016, `scikit-learn 20newsgroups dataset 20news-bydate.tar.gz`, version 2, Figshare입니다. 네 카테고리 선택·메타데이터 제거·마스킹·빈 문서 제외·재분할·수치 변환의 변경 내용을 출처 보고서에 기록했습니다. [배포 기록 DOI](https://doi.org/10.6084/m9.figshare.3829962.v2), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), [출처와 이용 조건 보고서](docs/A4_1_data_sources.md)
+
+후속 자동 검사에서 사용 데이터 3,787건의 이메일·지정 전화번호 패턴은 0건이었습니다. 대문자 단어 조합 후보는 18,426개가 2,292개 문서에서 검출됐으며 제목·기관명도 포함합니다. 이 검사는 소문자 인명이나 다른 식별 정보를 놓칠 수 있어 전체 개인정보 검수는 진행 대기 상태입니다. 공개 보고서에는 집계만 기록하고 검토용 문맥은 Git에서 제외되는 `artifacts/private_review/`에 저장합니다. [자동 검사 보고서](artifacts/privacy_audit.json)
+
+[미션 PDF](docs/A4_1_mission.pdf), [평가 PDF](docs/A4_1_eval.pdf), [평가 대비 Q&A](docs/A4_1_mission_QnA.md), [발표 개요](docs/A4_1_presentation_outline.md)를 함께 확인할 수 있습니다.
+
+분류·보너스 JSON 생성기는 스키마 버전 2에서 수치·레이블·문서 ID·기여도 값을 저장합니다. 분류 설명은 `feature_id`로 연결하며 본문·스니펫·원본 기여 단어를 저장하는 경로를 제거했습니다. 공개 검색 출력 파일은 점수와 문서 ID로 구성했고, 로컬 CLI는 미션의 스니펫 출력을 지원합니다. README와 평가 문서에는 검토한 비식별 발췌와 기여 단어를 사용했습니다. [통합 작업 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 #8](https://github.com/ntt65/A4_1/issues/8)
+
+검사와 패키지 생성은 다음 명령으로 재현합니다. `audit_data.py`는 검사 집계와 로컬 검토 후보를 생성하고, `package_project.py`는 공개 지표 검사 후 지정한 파일로 ZIP을 생성합니다. Git 관리 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. [후속 실행 계획](docs/A4_1_data_review_plan.md)
+
+```bash
+python audit_data.py
+python audit_data.py --check-public
+python package_project.py
+```
+
+작업 개요·단계별 계획·실행 체크표와 GitHub 전달 상태를 다음 문서에 연결했습니다. [개요와 아키텍처](docs/repo_readme/docs_01_system_architecture_and_plan.md), [상세 계획](IMPLEMENTATION_PLAN.md), [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md), [진행 이력](docs/repo_readme/docs_04_development_log_timeline.md)
 
 ## 보너스 과제 구현 및 검증
 
-보너스 검증은 `python main.py --bonus`의 코드 이관 후 다시 수행해야 합니다.
+보너스 전체 결과는 [측정 JSON](artifacts/bonus_metrics.json)과 [실행 출력](artifacts/run_logs/bonus.txt)에 있습니다.
 
-### TF 변형
+### Raw·Log·Double TF 비교
 
-Raw Count는 $tf$, Log Normalization은 $\ln(1+tf)$, Double Normalization은 양수 빈도에 대해 $0.5+0.5tf/\max(tf)$를 사용합니다. 빈도가 0인 원소는 0으로 유지하고 빈 문서는 영벡터로 처리합니다. IDF·분할·쿼리를 고정해 각 방식의 Macro-F1, Accuracy, 검색 관련도와 순위 변화를 비교해야 합니다. 선행 문서의 Double Norm Accuracy 기록은 96.66%이며 로컬 재측정 대기 상태입니다.
+Raw는 $tf$, Log는 $\ln(1+tf)$, Double은 양수 빈도에 $0.5+0.5tf/\max(tf)$를 적용합니다. 0 빈도와 빈 문서는 0으로 보존합니다. 같은 학습 어휘·IDF·분할·분류기를 사용했습니다.
 
-### BM25
+| TF 방식 | Accuracy | Macro-F1 | Raw 대비 우주 질의 Top-5 집합 일치율 |
+| --- | --- | --- | --- |
+| Raw | 92.4802% | 0.925329 | 100% |
+| Log | 92.4802% | 0.925139 | 60% |
+| Double | 91.9525% | 0.919962 | 40% |
 
-$$\mathrm{score}(d,q)=\sum_{t\in q}\ln\left(1+\frac{N-\mathrm{df}(t)+0.5}{\mathrm{df}(t)+0.5}\right)\frac{tf(t,d)(k_1+1)}{tf(t,d)+k_1(1-b+b|d|/\mathrm{avgdl})}$$
+질의는 `space satellite launch orbit`입니다. 네 주제 질의 전체의 집합 일치율도 JSON에 기록했습니다. 이 일치율은 순위 변화의 측정값이며, 관련도 정답에 따른 검색 품질 평가는 별도로 필요합니다.
 
-계획값은 $k_1=1.5$, $b=0.75$입니다. Toy 문서 세 건을 수작업 계산한 값과 대조하고, 같은 쿼리에서 TF-IDF와 BM25 Top-5 결과를 비교해야 합니다. 쿼리 중복 토큰 처리도 구현과 수작업 계산에서 일치시켜야 합니다.
+### BM25 수식과 수작업 검증
 
-### 역색인
+$$score(d,q)=\sum_{t\in q}\ln\left(1+\frac{N-df(t)+0.5}{df(t)+0.5}\right)\frac{tf(t,d)(k_1+1)}{tf(t,d)+k_1(1-b+b|d|/avgdl)}$$
 
-단어에서 `(doc_id, tf)` posting 리스트로 연결합니다. Dense 전체 스캔은 질의당 $O(N|V|)$이며 역색인은 쿼리 단어의 posting을 순회하고 후보를 정렬하는 비용이 발생합니다. 흔한 단어로 후보가 늘어나면 가속 폭이 줄어듭니다. 같은 0점 제외 및 동점 정책으로 점수 오차와 순위를 비교하고 구축·질의 시간을 분리해 측정해야 합니다.
+$k_1=1.5$, $b=0.75$이며 반복 질의 단어는 반복 횟수만큼 기여합니다. Toy corpus `[[cat, sat, sat], [cat, dog], [dog]]`와 질의 `[cat, sat]`에서 $N=3$, $avgdl=2$입니다. 수작업 기대값은 `[1.5908508972825368, 0.47000362924573563, 0]`, 최대 오차는 **2.2204e-16**으로 기준 `1e-6`을 통과했습니다.
 
-| 항목 | 기존 보고 | 로컬 검증 상태 |
-| --- | --- | --- |
-| BM25 Toy 오차 | 5.55e-17 | 코드와 원시 계산 부재 |
-| 역색인 점수 오차 | 2.78e-17 | 코드와 실행 로그 부재 |
-| 역색인 순위 일치율 | 100% | 평가 쿼리·순위 결과 부재 |
+같은 우주 질의에서 TF-IDF의 문서 ID 순서는 `[1934, 2609, 755, 2145, 1725]`, BM25는 `[755, 1934, 1725, 186, 3027]`입니다. BM25는 TF 포화와 문서 길이 보정을 사용해 순위와 후보 집합이 달라집니다. 점수는 각 방식의 척도로 해석하고, 품질 향상은 관련도 정답을 확보한 뒤 평가해야 합니다.
+
+### 역색인 동치성과 시간
+
+역색인은 단어 ID를 `(doc_id, normalized_tfidf_weight)` posting으로 연결합니다. 네 주제 질의와 빈 입력·OOV·반복 단어 질의까지 총 7개에서 dense 전체 스캔 대비 최대 점수 오차 **0**, Top-5 순위 일치율 **100%**를 확인했습니다.
+
+인덱스 구축은 **0.463321초**였습니다. 우주 질의의 점수 계산과 Top-5 선택은 dense **24.0746ms**, 역색인 **0.3283ms**였습니다. 토큰화·벡터화 시간은 제외했고 BLAS 2스레드, 워밍업 후 3회 중앙값입니다. 다른 환경이나 전체 질의 분포의 지연은 추가 측정이 필요합니다. 역색인의 계산 비용은 조회 posting 수와 후보 정렬에 의존하며 자주 등장하는 단어는 후보가 많아질 수 있습니다.
