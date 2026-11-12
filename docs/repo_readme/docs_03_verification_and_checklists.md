@@ -1,8 +1,8 @@
 # A4_1 실측 결과와 실행 체크표
 
-단일 노트북은 후속 PR #14에서 검토합니다. [노트북 PR #14](https://github.com/ntt65/A4_1/pull/14), [계획·실행·전달 체크표](../A4_1_notebook_plan.md)
+단일 노트북 PR #14와 선행 통합 PR #12는 모두 `main`에 병합했습니다. 병합 후 로컬 `main`과 `origin/main`이 744cfc7로 일치함을 확인했습니다. [노트북 PR #14](https://github.com/ntt65/A4_1/pull/14), [계획·실행·전달 체크표](../A4_1_notebook_plan.md)
 
-현재 구현·검증·Git 관리의 검토 경로는 `main` 대상 통합 PR #12입니다. 이전 PR #9·#10은 전체 변경 포함을 확인한 뒤 대체 종료했습니다. Git 관리 회귀 검사를 포함한 전체 검사 59개를 통과했습니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12), [Git 관리 실행 체크표](../git_workflow_repair_plan.md)
+이전 PR #9·#10은 전체 변경 포함을 확인한 뒤 통합 PR #12로 대체 종료했습니다. 노트북·Git 관리 회귀 검사를 포함한 전체 검사 59개를 통과했습니다. README·미션 Q&A 보완과 평가 Q&A 작성은 이슈 #15에서 추적합니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12), [Git 관리 실행 체크표](../git_workflow_repair_plan.md), [문서 보완 계획](../A4_1_docs_finalization_plan.md)
 
 2026-11-12 로컬 검증 결과입니다. 작업 브랜치는 `feat/a4-1-nlp-verification`이며, 소스 복원과 문서 통합을 이슈 #7에서 추적합니다. 개인정보 전체 검수와 데이터 이용 조건 확인은 이슈 #8에 남아 있습니다. [구현 이슈 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
 

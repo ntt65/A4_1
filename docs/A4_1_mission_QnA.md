@@ -1,10 +1,19 @@
-# A4_1 평가 대비 질의응답
+# A4_1 미션 학습 Q&A
 
-2026-11-12 기준입니다. [미션 PDF](A4_1_mission.pdf) 2쪽의 학습목표 순서로 Q1~Q5를 구성하고, [평가 PDF](A4_1_eval.pdf) 10~11쪽의 항목 1~5와 연결했습니다. 첨부된 Python 코드를 복원하고 실행 결함을 수정했습니다. 아래 수식과 작은 예제는 동작 설명에 사용하며, 전체 데이터 실측은 생성된 검증 산출물을 근거로 기록합니다.
+2026-11-12 기준입니다. [미션 PDF](A4_1_mission.pdf) 2쪽의 학습목표 순서로 Q1~Q5를 구성했습니다. 개념을 설명하는 작은 예제와 전체 데이터의 실측을 구분하고, 각 답변을 현재 구현에 연결합니다. 구현과 단일 노트북은 PR #12·#14를 통해 `main` 744cfc7에 병합됐습니다.
 
-이슈 #8의 후속 검수에서는 실제 배포 파일의 CC BY 4.0 표시와 불용어 선정 근거를 확인하고, 전체 사용 문서 3,787건의 자동 패턴 검사를 수행했습니다. 인명·서명에 대한 수동 검수는 진행 대기 상태입니다. [출처와 선정 근거](A4_1_data_sources.md), [검수 실행 계획](A4_1_data_review_plan.md)
+| 읽는 목적 | 문서 |
+| --- | --- |
+| 개념을 이해하고 짧게 설명하기 | 이 문서의 Q1~Q5 |
+| 평가표 질문 순서대로 답변하기 | [평가 Q&A](A4_1_eval_QnA.md): 16개 질문과 보너스 |
+| 설치·CLI·함수 호출과 실험 결과 확인 | [README](../README.md) |
+| 설명과 구현을 한 파일에서 실행하기 | [단일 Jupyter 노트북](../A4_1_mission.ipynb) |
 
-## 평가표 번호별 대응
+아래 Python 예제는 **프로젝트 루트 `D:\git\A4_1`에서 `.venv` Python으로 실행**하는 소스 모듈 예제입니다. 노트북에서는 동일한 핵심 구현을 셀 안에 정의하므로 `src` 모듈을 가져올 필요가 없습니다. 출처와 불용어 선정 근거는 [데이터 출처 문서](A4_1_data_sources.md)에 있습니다.
+
+## 학습 질문과 평가표의 대응
+
+`1-1` 등의 하위 번호는 [평가 PDF](A4_1_eval.pdf) 10~11쪽의 각 항목 안에서 질문 순서대로 붙인 문서 번호입니다. PDF에 인쇄된 별도 배점 번호가 아닙니다. 원문 순서에 따른 자세한 답변은 [평가 Q&A](A4_1_eval_QnA.md)에서 확인합니다.
 
 | 평가표 번호 | PDF의 질문 순서 | 답변 및 제출 근거 |
 | --- | --- | --- |
@@ -51,6 +60,12 @@ assert tokens == ["space", "satellite", "3d_x"]
 
 `TextPreprocessor.tokenize`가 소문자화·정규식 추출·불용어 제거를 수행합니다. 불용어 경로는 모듈 위치를 기준으로 정해 실행 디렉터리가 바뀌어도 같은 목록을 읽습니다. [전처리 구현](../src/preprocess.py), [고정 불용어 목록](../resources/stopwords_en.txt)
 
+정규식은 Unicode 규칙이므로 한국어 문자열도 토큰으로 남을 수 있지만 조사·어미를 분리하지는 않습니다. 토큰화와 OOV 처리도 구분해야 합니다. 토큰화는 단어를 추출하는 단계이고, OOV 제외는 이후 학습 어휘에 없는 토큰을 벡터에 넣지 않는 단계입니다.
+
+### 구술 한 문장
+
+“토큰화로 단어를 셀 수 있는 단위를 정하고, 이 프로젝트는 같은 토큰화 함수를 NumPy와 sklearn에 전달해 전처리 차이를 제거했습니다.”
+
 ## Q2. TF, IDF, TF-IDF의 정의와 역할은 무엇인가
 
 ### 핵심 답변 3줄 요약
@@ -87,6 +102,43 @@ assert normalized.shape == (2, 2)
 
 로컬 실측에서 어휘 크기는 33,297이며 Train shape는 `(3029, 33297)`, Test shape는 `(758, 33297)`입니다. Train 최대 오차는 `2.3315e-15`, Test 최대 오차는 `8.3267e-16`, 검증 쿼리 다섯 건의 최대 오차와 IDF 오차는 0입니다. 모두 미션의 `1e-6` 기준을 통과했습니다. [실측 검증 결과](../artifacts/tfidf_verification.json)
 
+### Train에서만 학습하는 작은 실행 예
+
+아래에서는 `fit` 후 Test를 변환해도 어휘와 IDF가 변하지 않는지 확인합니다. `analyzer`에 callable을 전달했으므로 소문자화·토큰화·불용어 제거는 그 함수가 담당합니다.
+
+```python
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from src.preprocess import TextPreprocessor
+from src.tfidf import CustomTfidfVectorizer
+
+analyzer = TextPreprocessor().tokenize
+train = ["space orbit", "orbit graphics"]
+vec = CustomTfidfVectorizer(TextPreprocessor())
+actual = vec.fit_transform(train)
+reference = TfidfVectorizer(
+    analyzer=analyzer, smooth_idf=True, sublinear_tf=False,
+    norm="l2", dtype=np.float64,
+)
+expected = reference.fit_transform(train).toarray()
+assert vec.vocabulary_ == reference.vocabulary_
+np.testing.assert_allclose(actual, expected, rtol=0, atol=1e-12)
+
+vocabulary_before, idf_before = vec.vocabulary_.copy(), vec.idf_.copy()
+test = vec.transform(["newword orbit", "", "the and", "zzzzunseenterm"])
+assert test.shape == (4, 3)
+assert "newword" not in vec.vocabulary_
+assert np.all(test[1:] == 0)
+assert vec.vocabulary_ == vocabulary_before
+np.testing.assert_array_equal(vec.idf_, idf_before)
+```
+
+**순서:** TF는 문서별 개수, DF는 그 단어가 나온 Train 문서 수, IDF는 DF로 계산한 열별 가중치, TF-IDF는 TF와 IDF의 곱입니다. 마지막으로 행별 L2 정규화를 적용합니다. 드문 단어일수록 IDF가 커지며 로그는 그 차이를 완만하게 합니다.
+
+### 구술 한 문장
+
+“Train에서 만든 어휘와 IDF를 고정한 뒤 Test와 질의를 변환했으며, 같은 설정의 sklearn과 비교한 Train 최대 오차는 약 `2.33e-15`입니다.”
+
 ## Q3. 코사인 유사도는 내적과 정규화로 어떻게 계산하는가
 
 ### 핵심 답변 3줄 요약
@@ -111,9 +163,32 @@ assert np.isclose((x / np.linalg.norm(x)) @ (q / np.linalg.norm(q)), 0.8)
 
 내적 8을 길이 곱 10으로 나눠 유사도 0.8이 됩니다. 원시 유클리드 거리는 문서 길이에 따라 달라집니다. 단위 벡터에서는 $\|\hat{x}-\hat{q}\|^2=2-2\cos(x,q)$이므로 두 기준이 같은 순위를 줄 수 있습니다. OOV만 있는 쿼리는 정규화 분모가 0이므로 영벡터를 유지하고 빈 결과를 반환합니다. 검색 결과는 양수 점수만 포함하고 점수 내림차순·동점 문서 ID 오름차순으로 정렬합니다. [검색과 순위 구현](../src/search_engine.py)
 
+### 빈 질의·OOV·동점의 실행 예
+
+```python
+import numpy as np
+from src.search_engine import SearchEngine, rank_scores
+from src.tfidf import CustomTfidfVectorizer
+
+documents = ["space orbit", "computer graphics"]
+vec = CustomTfidfVectorizer().fit(documents)
+engine = SearchEngine(vec, documents)
+assert engine.search("", top_k=5) == []
+assert engine.search("zzzzunseenterm", top_k=5) == []
+assert engine.search("space", top_k=5)[0][1] == 0
+np.testing.assert_array_equal(rank_scores([0, 0.8, 0.8, 0.1], 1), [1])
+np.testing.assert_array_equal(rank_scores([0, 0.8, 0.8, 0.1], 9), [1, 2, 3])
+```
+
+`search(query, top_k=5)`의 반환 항목은 `(점수, Train 문서 ID, 최대 150자 스니펫)`입니다. 양수 점수 문서가 5건보다 적으면 그 수만 반환합니다. 소스 CLI의 저장 형식은 pickle이며, 독립 노트북은 JSON 메타데이터와 NPY 행렬을 저장하고 mmap으로 재로딩합니다. 각 실행 경로에서 저장 전후 검색 결과의 동치성을 확인했습니다.
+
 ### 백만 문서로 확장한다면
 
 Dense `float64` TF-IDF 행렬은 $8N|V|$ 바이트가 필요합니다. $N=10^6$, $|V|=50,000$이면 원소 저장에만 400GB, 약 372.5GiB가 필요하고 질의당 전체 스캔은 $O(N|V|)$입니다. 희소 행렬과 역색인으로 쿼리 단어의 posting만 순회하고 후보 Top-K를 계산하는 방식으로 확장할 수 있습니다. 인덱스 업데이트, 캐시와 동시 질의 처리도 함께 설계해야 합니다. 구축 시간·메모리·질의 지연 p50/p95를 측정하고 동일 쿼리에서 품질과 점수 동치성을 확인해야 합니다.
+
+### 구술 한 문장
+
+“문서와 질의를 L2 정규화하면 코사인을 내적 한 번으로 계산할 수 있고, 빈 벡터는 0점으로 처리해 검색 결과에서 제외합니다.”
 
 ## Q4. BoW가 문맥과 어순을 잃는 한계는 무엇인가
 
@@ -127,10 +202,12 @@ Dense `float64` TF-IDF 행렬은 $8N|V|$ 바이트가 필요합니다. $N=10^6$,
 
 ```python
 from collections import Counter
+from src.preprocess import TextPreprocessor
 
 a = Counter("dog bites man".split())
 b = Counter("man bites dog".split())
 assert a == b
+assert TextPreprocessor().tokenize("not good") == ["good"]
 ```
 
 같은 어휘 빈도에 같은 IDF를 곱하므로 TF-IDF도 같습니다. 반면 주어와 목적어가 바뀌어 의미는 달라집니다. `not good`에서 `not`을 불용어로 제거하면 `good`만 남아 부정이 사라질 수 있습니다. 이 예제는 한계를 설명하기 위한 구성 사례입니다.
@@ -147,7 +224,7 @@ $$\Delta=(b_{\hat y}-b_y)+\sum_t x_t(w_{\hat y,t}-w_{y,t})$$
 | --- | --- | --- |
 | 3 | talk.politics.mideast → sci.space | `palestinian police force` 제안을 묻는 짧은 글입니다. `palestinian` −0.3580에도 `idea` +0.2409, `stage` +0.0914, `fit` +0.0788과 절편 차이 +0.2461이 작용해 최종 차이가 +0.0123입니다. 범용 단어의 합이 정치 문맥을 충분히 표현하지 못한 사례입니다. |
 | 5 | comp.graphics → sci.space | `9 x 6`, `base 13`을 언급하는 짧은 참조입니다. `system` +0.1815, `base` +0.0935가 예측을 지지하며 최종 차이는 +0.4278입니다. 직접적인 그래픽 어휘와 대화·문화적 문맥이 부족합니다. |
-| 13 | comp.graphics → rec.sport.baseball | compiler·COBOL·Pascal 관련 농담입니다. `compiler` −0.0895보다 이름 토큰 +0.2122, `think` +0.1741 등 공유 표현의 영향이 커 최종 차이가 +0.2199입니다. 남은 서명과 일반 표현의 우연한 연관이 오판에 기여했습니다. 문서에는 이름 토큰을 가려 기재했습니다. |
+| 13 | comp.graphics → rec.sport.baseball | compiler·COBOL·Pascal 관련 농담입니다. `compiler` −0.0895보다 가려진 잔존 서명 토큰 +0.2122, `think` +0.1741 등 공유 표현의 영향이 커 최종 차이가 +0.2199입니다. 서명과 일반 표현의 우연한 연관이 오판에 기여한 사례로 해석했습니다. |
 | 19 | rec.sport.baseball → sci.space | 과거 잡지 기사 날짜를 묻습니다. `si` +0.1221, `date` +0.0700과 절편 차이 +0.0771 등이 작용해 최종 차이는 +0.0233입니다. 짧은 약어와 이전 대화 맥락을 빈도만으로 해석하기 어렵습니다. |
 | 25 | talk.politics.mideast → sci.space | 짧은 반문에서 전처리 후 한 토큰만 남습니다. 해당 토큰 기여 −0.1325보다 절편 차이 +0.2461이 커 최종 차이는 +0.1136입니다. 주제 어휘의 희소성 때문에 절편의 영향이 상대적으로 커졌습니다. |
 
@@ -157,9 +234,17 @@ $$\Delta=(b_{\hat y}-b_y)+\sum_t x_t(w_{\hat y,t}-w_{y,t})$$
 
 같은 표면형 `사과`가 하나의 차원에 매핑돼 의도를 구분하기 어렵습니다. 주변 단어를 반영하는 n-gram, 질의 확장 또는 명확화, 문맥 임베딩을 비교할 수 있습니다. 단일 단어 쿼리의 의도가 불명확한 경우에는 사용자에게 의미 선택을 제공하는 방식도 가능합니다.
 
+이는 다의어를 설명하는 구성 예제입니다. 현재 영문 20 Newsgroups에서 `사과`를 검색해 품질을 측정했다는 뜻은 아닙니다. 이 질문과 대규모 검색·재구현 설계의 상세 답변은 [평가 Q&A](A4_1_eval_QnA.md)의 영역 4에 모았습니다.
+
 ### 재구현과 검색 품질 평가
 
 관련도 정답이 있는 평가 쿼리 집합을 만들고 `Precision@5 = Top-5 중 관련 문서 수 / 5`와 순위별 관련도를 반영한 nDCG@5를 측정합니다. 예를 들어 결과 다섯 건 중 네 건이 관련 문서이면 Precision@5는 0.8입니다. 같은 학습·평가 분할을 유지하면서 unigram, bigram, BM25, 문맥 모델을 비교하고 개선 선택에는 질의 지연도 함께 고려합니다. 분류 성능은 Accuracy와 Macro-F1, 클래스별 혼동 행렬로 별도 측정합니다.
+
+현재는 관련도 정답셋을 구축하지 않았으므로 Precision@5·nDCG@5의 실측값을 보고하지 않습니다. TF-IDF의 sklearn 오차나 역색인의 순위 일치는 계산 검증이며 검색 관련도 품질과는 다른 지표입니다.
+
+### 구술 한 문장
+
+“BoW는 단어의 빈도는 남기지만 어순과 문맥을 잃으므로, 실제 오분류의 단어 기여도를 설명하고 개선 효과는 같은 분할과 별도의 관련도 정답으로 확인해야 합니다.”
 
 ## Q5. 전처리 기준은 어떤 근거로 설계했는가
 
@@ -167,7 +252,7 @@ $$\Delta=(b_{\hat y}-b_y)+\sum_t x_t(w_{\hat y,t}-w_{y,t})$$
 
 1. 소문자화와 두 글자 이상 단어 정규식으로 표기 변동과 일부 잡음을 줄이며 참조 구현과 같은 토큰열을 사용합니다.
 2. 불용어 목록은 고정 파일로 관리하고 부정어·도메인 핵심어의 정보 손실을 검토합니다.
-3. Train 전용 어휘·IDF 학습과 공통 전처리 함수로 데이터 누수를 차단하고 변경 효과를 재현 가능하게 비교합니다.
+3. Train에서만 어휘·IDF를 학습해 Test의 어휘·문서 빈도가 학습에 들어가지 않게 하고 변경 효과를 재현 가능하게 비교합니다.
 
 ### 수식과 코드 근거
 
@@ -188,17 +273,31 @@ assert tokens == ["space", "satellite"]
 
 전처리는 토큰열 생성, 벡터화는 어휘·IDF 학습과 변환, 검색은 점수와 순위 계산, 분류는 모델 학습과 평가를 담당하도록 나눕니다. 같은 전처리와 벡터 표현을 검색과 분류에서 재사용하고 단계별 오류를 확인할 수 있기 때문입니다.
 
-새 데이터셋에서는 `load_data`의 `(문서, 레이블)` 반환 규격과 tokenizer를 교체해 벡터화·검색 코드를 재사용할 수 있습니다. 현재 카테고리는 `CATEGORIES`, 캐시 경로는 프로젝트의 `artifacts/data_cache`로 지정돼 있습니다. 데이터 로더는 헤더·푸터·인용문 제거, 이메일·일반 전화번호 형식 마스킹, 빈 본문 제외 후 층화 8:2 분할을 수행합니다. `random_state=42`, 클래스별 건수와 코퍼스 해시를 메타데이터에 저장합니다. [데이터 로더](../src/dataset.py)
+새 데이터셋에서도 `load_data`가 반환하는 `(train_docs, y_train), (test_docs, y_test), target_names` 규격을 유지하고 데이터 읽기와 tokenizer를 바꾸면 벡터화·검색 코드를 재사용할 수 있습니다. 현재 카테고리는 `CATEGORIES`, 캐시 경로는 프로젝트의 `artifacts/data_cache`로 지정돼 있습니다. 데이터 로더는 헤더·푸터·인용문 제거, 이메일·일반 전화번호 형식 마스킹, 빈 본문 제외 후 층화 8:2 분할을 수행합니다. `random_state=42`, 클래스별 건수와 코퍼스 해시를 메타데이터에 저장합니다. 한국어 형태소 분석이나 동의어 치환은 현재 구현된 기능이 아니라 변경 실험의 대상입니다. [데이터 로더](../src/dataset.py)
 
 실측 데이터는 원본 3,894건에서 빈 본문 107건을 제외한 3,787건이며 Train 3,029건, Test 758건입니다. 카테고리 순서별 Test 건수는 `[191, 192, 191, 184]`입니다. [데이터 메타데이터](../artifacts/dataset_metadata.json)
 
 사용 중인 sklearn 다운로드 file ID `5975967`과 일치하는 Figshare 배포 항목에서 CC BY 4.0을 확인했습니다. 등록 저자·DOI·라이선스 링크와 프로젝트의 수정 내용을 출처 보고서에 기록했습니다. [데이터 출처와 이용 조건 확인](A4_1_data_sources.md)
 
-전체 사용 문서 3,787건의 자동 검사에서는 이메일 0건, 전화번호 후보 0건, 인명·제목 형태 후보 18,426건이 검출됐습니다. 후보가 있는 문서는 2,292건입니다. 대문자 단어열에는 제목과 기관명도 포함될 수 있고, 소문자 이름이나 다른 식별 정보를 놓칠 수 있습니다. 이 결과와 자동 마스킹 적용 범위를 설명하고 인명·서명 전체 수동 검수를 이어가야 합니다. [자동 검사 결과](../artifacts/privacy_audit.json), [검수 실행 계획](A4_1_data_review_plan.md)
+현재 처리 범위는 위 전처리·마스킹 규칙이며, 이번 문서 보완에서는 데이터 처리 규칙과 코퍼스를 변경하지 않았습니다. 소스와 노트북의 전체 회귀 검사 기록은 59개 통과이며, 독립 노트북은 새 커널에서 28개 셀 중 코드 14개를 순서대로 실행했습니다. [실행 기록](../artifacts/verification_results.json), [노트북 독립 실행 근거](../artifacts/notebook_verification.json)
+
+### 구술 한 문장
+
+“표기 변동과 기능어를 줄이는 규칙을 고정해 NumPy와 참조 구현이 같은 입력을 쓰게 했고, 부정어와 전문 용어가 손실되는 효과는 현재 설계의 한계로 설명합니다.”
 
 ## 보너스 구술 대비
 
 Double Normalization은 양수 빈도에만 $0.5+0.5tf/\max(tf)$를 적용하고 0은 0으로 보존해야 합니다. 빈 문서에서 최댓값이 0이 되는 경우도 처리합니다. Raw·Log·Double을 같은 분할로 비교하며 분류와 검색의 정량 지표를 각각 제시해야 합니다.
+
+```python
+import numpy as np
+from src.bonus.tf_variations import apply_tf_variant
+
+counts = np.array([[0.0, 1.0, 3.0], [0.0, 0.0, 0.0]])
+double = apply_tf_variant(counts.copy(), "double", K=0.5)
+np.testing.assert_allclose(double, [[0.0, 2 / 3, 1.0], [0.0, 0.0, 0.0]])
+assert np.all(double[counts == 0] == 0)
+```
 
 | TF 방식 | Accuracy | Macro-F1 | 우주 쿼리의 Raw Top-5와 겹침 비율 |
 | --- | --- | --- | --- |
@@ -210,4 +309,18 @@ Double Normalization은 양수 빈도에만 $0.5+0.5tf/\max(tf)$를 적용하고
 
 BM25는 TF 포화와 문서 길이 보정을 사용합니다. $k_1=1.5$, $b=0.75$로 Toy 문서 세 건을 독립 수식 계산과 비교했습니다. 기대 점수는 `[1.5908508973, 0.4700036292, 0]`이며 최대 오차는 `2.2204e-16`입니다. 같은 네 쿼리에서 TF-IDF와 BM25 Top-5도 기록했습니다. [보너스 실측 결과](../artifacts/bonus_metrics.json)
 
-역색인은 단어별 posting으로 후보를 줄입니다. 빈 입력·OOV·반복 단어를 포함한 일곱 쿼리에서 최대 점수 오차 0, Top-5 순위 일치율 100%를 확인했습니다. 이번 재실행의 구축 시간은 0.463321초였습니다. 우주 쿼리의 점수 계산·Top-5 선택 시간은 dense 24.0746ms, 역색인 0.3283ms였습니다. 이 시간은 벡터화 시간을 제외하고 BLAS 2스레드, 세 번 실행의 중앙값으로 측정했으며 하드웨어와 쿼리에 따라 달라집니다. [보너스 실측 결과](../artifacts/bonus_metrics.json)
+**반복 질의어의 정책은 실행 경로에 따라 다릅니다.** 소스 CLI의 `BM25Okapi.score()`는 `Counter(query_tokens)`를 사용해 반복 횟수만큼 기여를 더합니다. 단일 노트북의 `BonusBM25`는 고유 질의어마다 한 번만 더합니다. Toy와 네 주제 질의에는 중복 단어가 없지만, 반복 단어가 있는 질의의 두 실행 경로 점수가 같다고 보장하지 않습니다. [소스 BM25](../src/bonus/bm25.py), [노트북 구현](../A4_1_mission.ipynb)
+
+```python
+import numpy as np
+from src.bonus.bm25 import BM25Okapi, verify_bm25_toy_example
+
+result = verify_bm25_toy_example()
+assert result["passed"] and result["max_absolute_error"] < 1e-6
+model = BM25Okapi([["cat", "sat"], ["dog"]])
+np.testing.assert_allclose(model.score(["cat", "cat"]), 2 * model.score(["cat"]))
+```
+
+역색인은 단어별 posting으로 후보를 줄입니다. 저장된 CLI 측정에서는 빈 입력·OOV·반복 단어를 포함한 일곱 질의의 TF-IDF 최대 점수 오차 0, Top-5 순위 일치율 100%를 확인했습니다. 구축 시간은 0.463321초이며 우주 질의의 점수 계산·Top-5 선택 시간은 dense 24.0746ms, 역색인 0.3283ms입니다. 벡터화 시간을 제외하고 BLAS 2스레드, 세 번 실행의 중앙값으로 측정했으며 하드웨어와 질의에 따라 달라집니다. [CLI 보너스 실측 결과](../artifacts/bonus_metrics.json)
+
+노트북은 TF-IDF와 BM25 각각의 전체 계산·역색인 결과를 일곱 질의로 검증했습니다. 각 경로 안의 점수·순위 동치성을 확인한 것이며, 다른 반복 질의 정책을 가진 CLI와 노트북 사이의 BM25 상호 동치성 검증은 아닙니다. 보너스의 수식·복잡도·구술 답변은 [평가 Q&A](A4_1_eval_QnA.md)의 항목 5에서 확인합니다.
