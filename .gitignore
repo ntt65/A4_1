@@ -13,3 +13,5 @@ __pycache__/
 artifacts/data_cache/
 artifacts/index.pkl
 artifacts/private_review/
+artifacts/notebook/
+.ipynb_checkpoints/

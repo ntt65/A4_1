@@ -61,6 +61,32 @@ class PublicAuditTests(unittest.TestCase):
             with patch("audit_data.ROOT", root), self.assertRaises(ValueError):
                 audit_public_exports()
 
+    def test_stale_notebook_in_archive_is_rejected(self):
+        project = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artifacts = root / "artifacts"
+            (artifacts / "run_logs").mkdir(parents=True)
+            names = ("classifier_metrics.json", "bonus_metrics.json")
+            for name in names:
+                (artifacts / name).write_text("{}", encoding="utf-8")
+            search_output = "[1] Score: 0.5 | Doc #3\n"
+            (artifacts / "run_logs/search.txt").write_text(search_output, encoding="utf-8")
+            notebook_bytes = (project / "A4_1_mission.ipynb").read_bytes()
+            report_bytes = (project / "artifacts/notebook_verification.json").read_bytes()
+            (root / "A4_1_mission.ipynb").write_bytes(notebook_bytes)
+            (artifacts / "notebook_verification.json").write_bytes(report_bytes)
+            stale = json.loads(notebook_bytes)
+            stale["cells"][0]["source"] = ["# Older notebook version\n"]
+            with zipfile.ZipFile(root / "A4_1_complete_project_source.zip", "w") as archive:
+                for name in names:
+                    archive.writestr(f"artifacts/{name}", "{}")
+                archive.writestr("artifacts/run_logs/search.txt", search_output)
+                archive.writestr("A4_1_mission.ipynb", json.dumps(stale))
+                archive.writestr("artifacts/notebook_verification.json", report_bytes)
+            with patch("audit_data.ROOT", root), self.assertRaisesRegex(ValueError, "stale notebook"):
+                audit_public_exports()
+
 
 if __name__ == "__main__":
     unittest.main()
