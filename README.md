@@ -21,6 +21,8 @@ uv pip install --python .venv/Scripts/python.exe -r requirements-notebook.txt
 
 VS Code에서는 노트북을 열고 `.venv`의 Python 커널을 선택한 뒤 **Restart Kernel → Run All**을 실행합니다. 혼동 행렬은 저장 출력에 내장했습니다. 새 커널과 빈 임시 폴더에서 전체 실행을 검증했으며 28개 셀(코드 14개)이 통과했습니다. 의존성·캐시·메모리 조건은 첫 셀에 있고 전체 인명·서명 검수는 #8에서 추적합니다. [노트북 작업 #13](https://github.com/ntt65/A4_1/issues/13), [개요·실행 계획](docs/A4_1_notebook_plan.md), [실제 실행 결과](artifacts/notebook_verification.json)
 
+노트북의 구현·검증 변경은 선행 PR #12를 기준으로 한 [후속 PR #14](https://github.com/ntt65/A4_1/pull/14)에서 검토합니다. 구현 커밋은 `fd6f817`입니다.
+
 저장된 출력과 실행 기록의 일치를 검사하거나 새 커널 전체 실행을 재현합니다.
 
 ```powershell
