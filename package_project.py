@@ -13,6 +13,7 @@ def build_package():
     audit_public_exports(check_archive=False)
     files = [ROOT / name for name in (
         ".gitignore", "AGENTS.md", "README.md", "requirements.txt",
+        "requirements-notebook.txt", "A4_1_mission.ipynb",
         "main.py", "verify_tfidf.py", "audit_data.py", "package_project.py",
         "create_github_issues.py", ".gitattributes", ".githooks/commit-msg",
         "IMPLEMENTATION_PLAN.md", "docs/A4_1_mission.pdf", "docs/A4_1_eval.pdf",
@@ -20,6 +21,7 @@ def build_package():
         "docs/A4_1_data_sources.md", "docs/A4_1_data_review_plan.md",
         "docs/GIT_WORKFLOW.md", "docs/git_history_map.md",
         "docs/git_workflow_repair_plan.md", "docs/github_issues.json",
+        "docs/A4_1_notebook_plan.md",
     )]
     for directory, pattern in (
         ("src", "**/*.py"), ("tests", "*.py"), ("scripts", "*.py"),
@@ -31,6 +33,7 @@ def build_package():
     files.extend(ROOT / "artifacts" / name for name in (
         "bonus_metrics.json", "classifier_metrics.json", "dataset_metadata.json",
         "tfidf_verification.json", "verification_results.json", "privacy_audit.json",
+        "notebook_verification.json",
     ))
     files.extend(ROOT / "artifacts" / "run_logs" / name for name in (
         "verify_tfidf.txt", "search.txt", "classifier.txt", "bonus.txt",

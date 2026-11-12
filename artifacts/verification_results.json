@@ -100,5 +100,20 @@
       "main",
       "chore/a4-1-git-workflow"
     ]
+  },
+  "notebook_verification": {
+    "issue": 13,
+    "notebook": "A4_1_mission.ipynb",
+    "execution_report": "artifacts/notebook_verification.json",
+    "cells": 28,
+    "code_cells": 14,
+    "fresh_kernel": true,
+    "isolated_directory": true,
+    "regression_tests_passed": 59,
+    "regression_test_blas_threads": 2,
+    "full_corpus_manual_review": "pending (#8)",
+    "pull_request": 14,
+    "base_pr": 12,
+    "implementation_commit": "fd6f817c4950643b5bc874834444985abba068c1"
   }
 }

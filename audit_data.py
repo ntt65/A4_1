@@ -3,12 +3,14 @@
 import argparse
 from collections import Counter
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 from pathlib import Path
 import re
 import zipfile
 
 from src.dataset import ROOT, load_data
+from scripts.verify_notebook import validate_notebook
 
 
 FORBIDDEN_FIELDS = {"text", "snippet", "term"}
@@ -44,6 +46,16 @@ def audit_public_exports(check_archive=True):
     search_log = ROOT / "artifacts" / "run_logs" / "search.txt"
     check_search_output(search_log.read_text(encoding="utf-8"))
     result = {"status": "PASS", "checked_metrics": len(paths), "search_log": "numeric output", "archive": "not_checked"}
+    notebook_path = ROOT / "A4_1_mission.ipynb"
+    notebook_hash = None
+    if notebook_path.exists():
+        validate_notebook(json.loads(notebook_path.read_text(encoding="utf-8")), require_executed=True)
+        notebook_hash = hashlib.sha256(notebook_path.read_bytes()).hexdigest()
+        notebook_report = json.loads((ROOT / "artifacts/notebook_verification.json").read_text(encoding="utf-8"))
+        if notebook_report["notebook_sha256"] != notebook_hash:
+            raise ValueError("Notebook execution report is stale")
+        check_public_fields(notebook_report["results"], "notebook results")
+        result["notebook"] = "PASS"
     if not check_archive:
         return result
     archive_path = ROOT / "A4_1_complete_project_source.zip"
@@ -57,6 +69,18 @@ def audit_public_exports(check_archive=True):
             name = path.relative_to(ROOT).as_posix()
             check_public_fields(json.loads(archive.read(name)), f"ZIP/{name}")
         check_search_output(archive.read("artifacts/run_logs/search.txt").decode("utf-8"))
+        if notebook_hash is not None:
+            members = set(archive.namelist())
+            if not {"A4_1_mission.ipynb", "artifacts/notebook_verification.json"} <= members:
+                raise ValueError("Source archive is missing the verified notebook")
+            packed = archive.read("A4_1_mission.ipynb")
+            validate_notebook(json.loads(packed), require_executed=True)
+            if hashlib.sha256(packed).hexdigest() != notebook_hash:
+                raise ValueError("Source archive contains a stale notebook")
+            packed_report = json.loads(archive.read("artifacts/notebook_verification.json"))
+            if packed_report["notebook_sha256"] != notebook_hash:
+                raise ValueError("Source archive contains a stale notebook execution report")
+            check_public_fields(packed_report["results"], "ZIP/notebook results")
     result["archive"] = "PASS"
     return result
 

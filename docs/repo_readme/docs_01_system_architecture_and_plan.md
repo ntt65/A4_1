@@ -1,6 +1,8 @@
 # A4_1 구현 개요와 아키텍처
 
-현재 작업 브랜치는 `chore/a4-1-git-workflow`이며 구현·검증·Git 관리 변경을 통합 PR #12에서 검토합니다. 아래 복원 브랜치와 PR #9·#10은 단계별 작업 이력입니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12), [Git 관리 정리 계획](../git_workflow_repair_plan.md)
+단일 노트북 후속 작업은 `feat/a4-1-single-notebook`, 이슈 #13에서 진행합니다. `A4_1_mission.ipynb`에 구현과 설명을 내장하고 새 폴더·새 커널 전체 실행 및 전체 회귀 검사 59개를 통과했습니다. [노트북](../../A4_1_mission.ipynb), [개요·계획·실행 결과](../A4_1_notebook_plan.md)
+
+선행 작업 브랜치는 `chore/a4-1-git-workflow`이며 구현·검증·Git 관리 변경을 통합 PR #12에서 검토합니다. 아래 복원 브랜치와 PR #9·#10은 단계별 작업 이력입니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12), [Git 관리 정리 계획](../git_workflow_repair_plan.md)
 
 2026-11-12 사용자 제공 Python 소스를 복원하고 로컬에서 실행한 상태를 반영했습니다. 작업 브랜치는 `feat/a4-1-nlp-verification`입니다. 소스 복원·실측 검증·문서 통합은 이슈 #7에서 추적하고, 개인정보 잔존 검수와 데이터 이용 조건 확인은 이슈 #8에서 추적합니다. [구현 이슈 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 이슈 #8](https://github.com/ntt65/A4_1/issues/8)
 
@@ -70,6 +72,7 @@ src/bonus/              TF 변형·BM25·역색인 비교
 | M4 / #4 | 분류·혼동 행렬·실제 오분류 5건 | `src/classifier.py`, 분류 지표, 혼동 행렬, README 분석 | 완료 |
 | M6 / #6 | Raw·Log·Double TF·BM25·역색인 | `src/bonus/`, 보너스 지표·출력 | 완료 |
 | M5 / #5 | 평가 문서·실행 안내·패키지 | README, Q&A, 발표 개요, requirements | 로컬 작성·검증 완료 |
+| 단일 노트북 / #13 | 핵심 구현·실험·Q&A·별도 보너스 내장 | A4_1_mission.ipynb, 전용 의존성, 독립 실행 검증 기록 | 28개 셀 실행 통과 |
 | GitHub 작업 / #7·#11 | 작업 브랜치·이슈·커밋·PR 연결 | 구현 커밋 e3ff7e8, Git 관리 수정 450122a, main 대상 통합 PR #12 | 전달 완료, 통합 PR 검토 진행 |
 
 기존 이슈 #1~#6은 단계별 요구사항의 근거이며, 해당 이슈의 모든 수락 기준을 완료했다고 일괄 판정하지 않습니다. 소스 통합 이슈 #7과 데이터 검수 이슈 #8을 연결해 실제 완료 근거를 추적합니다.

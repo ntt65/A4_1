@@ -19,7 +19,7 @@
 | 7 | 데이터 개인정보·이용 조건 검수 | 부분 완료 | 배포 조건·불용어 근거·자동 검사·공개 생성 경로 확인, 전체 인명 검수는 이슈 #8 |
 | 8 | 작업 브랜치 커밋·푸시·PR | 완료 | 구현 커밋 e3ff7e8, 원격 푸시, main 대상 PR #9 |
 
-실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. Git 관리 검사를 포함한 전체 회귀 검사 50개와 요청된 네 CLI 명령을 통과했습니다.
+실제 명령과 환경은 [검증 기록](artifacts/verification_results.json)에 있고, 상세 완료 체크는 [실행 체크표](docs/repo_readme/docs_03_verification_and_checklists.md)에서 관리합니다. Git 관리 검사를 포함한 전체 회귀 검사 59개와 요청된 네 CLI 명령을 통과했습니다.
 
 현재 환경은 Python 3.14.7과 고정된 설치 패키지 조합입니다. 제공 소스의 구버전 의존성 범위를 현재 환경에 맞추고, 누락 import·초기화 파일명·실패 종료 코드·보너스 검증을 보완했습니다. 공통 analyzer의 실제 진입점은 `TextPreprocessor.tokenize`입니다.
 

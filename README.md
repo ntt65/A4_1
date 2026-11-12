@@ -6,9 +6,29 @@ NumPy로 TF-IDF와 코사인 검색을 구현하고, 20 Newsgroups 네 카테고
 
 코드·문서·커밋·이슈·PR은 로컬 작업 브랜치와 GitHub에서 관리합니다. AI Studio의 A4_1 프로젝트 GitHub 연결은 2026-11-12 해제했습니다. 기본 브랜치와 작업 브랜치, 과거 커밋의 목적 및 현재 검토 경로는 관리 문서에 기록했습니다. [Git 작업 절차](docs/GIT_WORKFLOW.md), [공개 이력 추적표](docs/git_history_map.md), [정리 실행 계획](docs/git_workflow_repair_plan.md)
 
-Git 관리·이슈 동기화 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. 기존 이슈 정의는 `docs/github_issues.json`에 있으며 `python create_github_issues.py`는 기본적으로 오프라인 미리보기를 출력합니다.
+노트북·Git 관리·이슈 동기화 검사를 포함한 전체 회귀 검사 59개를 통과했습니다. 기존 이슈 정의는 `docs/github_issues.json`에 있으며 `python create_github_issues.py`는 기본적으로 오프라인 미리보기를 출력합니다.
 
 현재 구현·검증·Git 관리 변경은 `main` 대상 통합 PR #12에서 검토합니다. PR #9·#10은 전체 변경 포함을 확인한 뒤 #12로 대체 종료했습니다. [통합 PR #12](https://github.com/ntt65/A4_1/pull/12)
+
+### 단일 Jupyter 노트북
+
+[A4_1_mission.ipynb](A4_1_mission.ipynb)에 전처리·NumPy TF-IDF·검색·분류·실제 오분류 5건·Q1~Q5·별도 보너스를 모두 담았습니다. 구현과 불용어 목록이 파일 안에 있으며 저장소의 `src`·기존 지표·이미지 없이 실행합니다. 새 폴더에 이 파일 하나만 복사한 뒤 의존성과 최초 데이터 다운로드를 준비해 사용할 수 있습니다.
+
+```powershell
+uv pip install --python .venv/Scripts/python.exe -r requirements-notebook.txt
+.\.venv\Scripts\python.exe -m jupyterlab A4_1_mission.ipynb
+```
+
+VS Code에서는 노트북을 열고 `.venv`의 Python 커널을 선택한 뒤 **Restart Kernel → Run All**을 실행합니다. 혼동 행렬은 저장 출력에 내장했습니다. 새 커널과 빈 임시 폴더에서 전체 실행을 검증했으며 28개 셀(코드 14개)이 통과했습니다. 의존성·캐시·메모리 조건은 첫 셀에 있고 전체 인명·서명 검수는 #8에서 추적합니다. [노트북 작업 #13](https://github.com/ntt65/A4_1/issues/13), [개요·실행 계획](docs/A4_1_notebook_plan.md), [실제 실행 결과](artifacts/notebook_verification.json)
+
+노트북의 구현·검증 변경은 선행 PR #12를 기준으로 한 [후속 PR #14](https://github.com/ntt65/A4_1/pull/14)에서 검토합니다. 구현 커밋은 `fd6f817`입니다.
+
+저장된 출력과 실행 기록의 일치를 검사하거나 새 커널 전체 실행을 재현합니다.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/verify_notebook.py
+.\.venv\Scripts\python.exe scripts/verify_notebook.py --execute
+```
 
 ### 데이터와 전처리
 
@@ -192,7 +212,7 @@ sklearn 문서는 헤더 등 메타데이터가 분류 성능에 영향을 줄 �
 
 분류·보너스 JSON 생성기는 스키마 버전 2에서 수치·레이블·문서 ID·기여도 값을 저장합니다. 분류 설명은 `feature_id`로 연결하며 본문·스니펫·원본 기여 단어를 저장하는 경로를 제거했습니다. 공개 검색 출력 파일은 점수와 문서 ID로 구성했고, 로컬 CLI는 미션의 스니펫 출력을 지원합니다. README와 평가 문서에는 검토한 비식별 발췌와 기여 단어를 사용했습니다. [통합 작업 #7](https://github.com/ntt65/A4_1/issues/7), [데이터 검수 #8](https://github.com/ntt65/A4_1/issues/8)
 
-검사와 패키지 생성은 다음 명령으로 재현합니다. `audit_data.py`는 검사 집계와 로컬 검토 후보를 생성하고, `package_project.py`는 공개 지표 검사 후 지정한 파일로 ZIP을 생성합니다. Git 관리 검사를 포함한 전체 회귀 검사 50개를 통과했습니다. [후속 실행 계획](docs/A4_1_data_review_plan.md)
+검사와 패키지 생성은 다음 명령으로 재현합니다. `audit_data.py`는 검사 집계와 로컬 검토 후보를 생성하고, `package_project.py`는 공개 지표·노트북 실행 근거 검사 후 지정한 파일로 ZIP을 생성합니다. 노트북·Git 관리 검사를 포함한 전체 회귀 검사 59개를 통과했습니다. [후속 실행 계획](docs/A4_1_data_review_plan.md)
 
 ```bash
 python audit_data.py
